@@ -1,0 +1,39 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "atlas-travel-diary-app",
+          "appId": "1:331546404605:android:96111762d5a003050c0094",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "atlas-travel-diary-app",
+          "configurations": {
+            "android": "1:331546404605:android:96111762d5a003050c0094",
+            "web": "1:331546404605:web:26bddca9ab56d9c00c0094"
+          }
+        }
+      }
+    }
+  }
+}

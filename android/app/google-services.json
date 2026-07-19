@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "331546404605",
+    "project_id": "atlas-travel-diary-app",
+    "storage_bucket": "atlas-travel-diary-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:331546404605:android:96111762d5a003050c0094",
+        "android_client_info": {
+          "package_name": "com.example.atlas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2Y3fDMBbSuy67Mu7ASWpsnGN-7au0vI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
