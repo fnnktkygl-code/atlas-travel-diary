@@ -39,6 +39,15 @@ class AuthScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 48),
+              if (context.watch<AuthProvider>().errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    "Erreur : ${context.watch<AuthProvider>().errorMessage}",
+                    style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ElevatedButton.icon(
                 icon: const Icon(Icons.login),
                 label: const Text('Se connecter avec Google'),

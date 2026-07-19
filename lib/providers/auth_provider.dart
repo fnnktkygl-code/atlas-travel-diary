@@ -16,12 +16,27 @@ class AuthProvider extends ChangeNotifier {
   User? get user => _user;
   String? get uid => _user?.uid;
   bool get isAuthenticated => _user != null;
+  String? errorMessage;
 
   AuthProvider() {
     _auth.authStateChanges().listen((User? user) {
       _user = user;
       notifyListeners();
     });
+    
+    if (kIsWeb) {
+      _checkRedirectResult();
+    }
+  }
+
+  Future<void> _checkRedirectResult() async {
+    try {
+      await _auth.getRedirectResult();
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
+      debugPrint("Error from redirect result: $e");
+    }
   }
 
   Future<void> signInWithGoogle() async {
