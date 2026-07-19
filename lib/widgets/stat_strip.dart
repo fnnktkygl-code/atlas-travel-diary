@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/map_provider.dart';
 import '../models/map_models.dart';
 import '../theme/app_theme.dart';
+import '../data/countries.dart';
 
 class StatStrip extends StatelessWidget {
   const StatStrip({Key? key}) : super(key: key);
@@ -14,15 +15,41 @@ class StatStrip extends StatelessWidget {
         int visited = 0;
         int wishlist = 0;
         int lived = 0;
+        int redlistCount = 0;
         
-        for (var data in provider.userData.values) {
-          if (data.status == CountryStatus.visited) visited++;
-          if (data.status == CountryStatus.lived) lived++;
-          if (data.status == CountryStatus.wishlist) wishlist++;
+        double exploredArea = 0.0;
+        double redlistArea = 0.0;
+        double totalGlobalArea = 0.0;
+        
+        for (var c in countriesData.values) {
+           totalGlobalArea += c.area;
+        }
+        
+        for (var entry in provider.userData.entries) {
+          final id = entry.key;
+          final status = entry.value.status;
+          final area = countriesData[id]?.area ?? 0.0;
+          
+          if (status == CountryStatus.visited) {
+            visited++;
+            exploredArea += area;
+          } else if (status == CountryStatus.lived) {
+            lived++;
+            exploredArea += area;
+          } else if (status == CountryStatus.wishlist) {
+            wishlist++;
+          } else if (status == CountryStatus.redlist) {
+            redlistCount++;
+            redlistArea += area;
+          }
         }
         
         final totalExplored = visited + lived;
-        final pctExplored = ((totalExplored / 188.0) * 100).toStringAsFixed(1);
+        final totalCountriesDenominator = (countriesData.length - redlistCount).clamp(1.0, 999.0);
+        final pctCountries = ((totalExplored / totalCountriesDenominator) * 100).toStringAsFixed(1);
+        
+        final totalAreaDenominator = (totalGlobalArea - redlistArea).clamp(1.0, double.infinity);
+        final pctArea = ((exploredArea / totalAreaDenominator) * 100).toStringAsFixed(1);
         
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
@@ -34,9 +61,10 @@ class StatStrip extends StatelessWidget {
           child: Row(
             children: [
               _buildCell('pays visités', '$totalExplored', false),
-              _buildCell('du monde exploré', '$pctExplored%', true),
-              _buildCell('pays habités', '$lived', false),
+              _buildCell('% pays monde', '$pctCountries%', true),
+              _buildCell('% surface monde', '$pctArea%', true),
               _buildCell('envies de voyage', '$wishlist', false),
+              if (redlistCount > 0) _buildCell('liste rouge', '$redlistCount', false),
             ],
           ),
         );

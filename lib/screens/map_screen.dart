@@ -20,6 +20,7 @@ class MapScreen extends StatelessWidget {
     final isVisited = currentData?.status == CountryStatus.visited;
     final isLived = currentData?.status == CountryStatus.lived;
     final isWish = currentData?.status == CountryStatus.wishlist;
+    final isRedlist = currentData?.status == CountryStatus.redlist;
 
     showModalBottomSheet(
       context: context,
@@ -81,6 +82,20 @@ class MapScreen extends StatelessWidget {
                 ),
                 onPressed: () {
                   provider.markCountryStatus(countryId, isWish ? CountryStatus.none : CountryStatus.wishlist);
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.block),
+                label: Text(isRedlist ? 'Déjà sur la liste rouge' : 'Ajouter à la liste rouge'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isRedlist ? AppTheme.countryRedlistHover : AppTheme.panelBg,
+                  foregroundColor: isRedlist ? Colors.white : AppTheme.textColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                onPressed: () {
+                  provider.markCountryStatus(countryId, isRedlist ? CountryStatus.none : CountryStatus.redlist);
                   Navigator.pop(context);
                 },
               ),

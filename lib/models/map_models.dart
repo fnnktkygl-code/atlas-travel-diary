@@ -5,6 +5,7 @@ enum CountryStatus {
   visited,
   lived,
   wishlist,
+  redlist,
 }
 
 class UserCountryData {

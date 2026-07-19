@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import '../models/map_models.dart';
@@ -39,6 +40,23 @@ class WorldMapPainter extends CustomPainter {
         ..style = PaintingStyle.fill
         ..color = _getFillColor(status, isHovered);
 
+      if (status == CountryStatus.redlist) {
+        fillPaint.shader = null; // reset just in case
+        // Custom discrete hatched shader
+        fillPaint.shader = ui.Gradient.linear(
+          const Offset(0, 0),
+          const Offset(8, 8),
+          [
+            _getFillColor(status, isHovered),
+            _getFillColor(status, isHovered),
+            const Color(0x33000000), // slightly darker line
+            const Color(0x33000000),
+          ],
+          [0.0, 0.5, 0.5, 1.0],
+          TileMode.repeated,
+        );
+      }
+
       for (var path in group.paths) {
         canvas.drawPath(path, fillPaint);
         canvas.drawPath(path, strokePaint);
@@ -54,6 +72,8 @@ class WorldMapPainter extends CustomPainter {
         return isHovered ? AppTheme.countryLivedHover : AppTheme.countryLived;
       case CountryStatus.wishlist:
         return isHovered ? AppTheme.countryWishlistHover : AppTheme.countryWishlist;
+      case CountryStatus.redlist:
+        return isHovered ? AppTheme.countryRedlistHover : AppTheme.countryRedlist;
       case CountryStatus.none:
         return isHovered ? AppTheme.countryHover : AppTheme.countryFill;
     }

@@ -19,6 +19,9 @@ class AppTheme {
   static const Color countryWishlist = Color(0xFFF59E0B);
   static const Color countryWishlistHover = Color(0xFFFBBF24);
   
+  static const Color countryRedlist = Color(0xFF1E2433);
+  static const Color countryRedlistHover = Color(0xFF2A3441);
+  
   static const Color cityDot = Color(0xFFF8FAFC);
   
   static const Color panelBg = Color(0xFF0F172A);

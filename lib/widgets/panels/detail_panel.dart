@@ -32,6 +32,7 @@ class DetailPanel extends StatelessWidget {
         final isVisited = currentData?.status == CountryStatus.visited;
         final isLived = currentData?.status == CountryStatus.lived;
         final isWish = currentData?.status == CountryStatus.wishlist;
+        final isRedlist = currentData?.status == CountryStatus.redlist;
 
         return PanelWidget(
           title: 'Pays sélectionné',
@@ -97,6 +98,20 @@ class DetailPanel extends StatelessWidget {
                       provider.markCountryStatus(selectedId, isWish ? CountryStatus.none : CountryStatus.wishlist);
                     },
                     child: Text(isWish ? 'Envie ✓' : 'Envie d\'y aller'),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isRedlist ? AppTheme.countryRedlistHover : AppTheme.panelBg,
+                      foregroundColor: isRedlist ? Colors.white : AppTheme.textColor,
+                      side: BorderSide(color: isRedlist ? AppTheme.countryRedlistHover : AppTheme.mapStroke),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    ),
+                    onPressed: () {
+                      provider.markCountryStatus(selectedId, isRedlist ? CountryStatus.none : CountryStatus.redlist);
+                    },
+                    child: Text(isRedlist ? 'Liste rouge ✓' : 'Liste rouge'),
                   ),
                 ],
               ),
