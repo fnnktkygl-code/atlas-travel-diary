@@ -50,8 +50,19 @@ class AuthScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () {
-                  context.read<AuthProvider>().signInWithGoogle();
+                onPressed: () async {
+                  try {
+                    await context.read<AuthProvider>().signInWithGoogle();
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Erreur de connexion : $e"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
             ],
