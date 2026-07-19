@@ -5,7 +5,12 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  GoogleSignIn? _googleSignInInstance;
+  
+  GoogleSignIn get _googleSignIn {
+    _googleSignInInstance ??= GoogleSignIn(scopes: ['email']);
+    return _googleSignInInstance!;
+  }
 
   User? _user;
   User? get user => _user;
