@@ -7,11 +7,13 @@ import 'world_map_painter.dart';
 class WorldMapWidget extends StatefulWidget {
   final Map<String, UserCountryData> userData;
   final Function(String countryId) onCountryTap;
+  final Function(String countryId)? onCountryDoubleTap;
 
   const WorldMapWidget({
     Key? key,
     required this.userData,
     required this.onCountryTap,
+    this.onCountryDoubleTap,
   }) : super(key: key);
 
   @override
@@ -57,6 +59,27 @@ class _WorldMapWidgetState extends State<WorldMapWidget> {
       for (var path in group.paths) {
         if (path.contains(point)) {
           widget.onCountryTap(group.id);
+          return;
+        }
+      }
+    }
+  }
+
+  Offset? _doubleTapPosition;
+
+  void _handleDoubleTapDown(TapDownDetails details) {
+    _doubleTapPosition = details.localPosition;
+  }
+
+  void _handleDoubleTap() {
+    if (_parsedGroups == null || _doubleTapPosition == null) return;
+    
+    final point = _doubleTapPosition!;
+    
+    for (var group in _parsedGroups!) {
+      for (var path in group.paths) {
+        if (path.contains(point)) {
+          widget.onCountryDoubleTap?.call(group.id);
           return;
         }
       }
@@ -113,6 +136,8 @@ class _WorldMapWidgetState extends State<WorldMapWidget> {
             },
             child: GestureDetector(
               onTapUp: _handleTap,
+              onDoubleTapDown: _handleDoubleTapDown,
+              onDoubleTap: _handleDoubleTap,
               child: CustomPaint(
                 size: const Size(_mapWidth, _mapHeight),
                 painter: WorldMapPainter(
