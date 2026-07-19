@@ -51,40 +51,51 @@ class DetailPanel extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              Row(
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isVisited ? AppTheme.countryVisited : AppTheme.panelBg,
-                        foregroundColor: isVisited ? AppTheme.ink1 : AppTheme.textColor,
-                        side: BorderSide(color: isVisited ? AppTheme.countryVisited : AppTheme.mapStroke),
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                      ),
-                      onPressed: () {
-                        provider.markCountryStatus(selectedId, isVisited ? CountryStatus.none : CountryStatus.visited);
-                      },
-                      child: Text(isVisited ? 'Visité ✓' : 'Marquer visité'),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isVisited ? AppTheme.countryVisited : AppTheme.panelBg,
+                      foregroundColor: isVisited ? AppTheme.ink1 : AppTheme.textColor,
+                      side: BorderSide(color: isVisited ? AppTheme.countryVisited : AppTheme.mapStroke),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                     ),
+                    onPressed: () {
+                      provider.markCountryStatus(selectedId, isVisited ? CountryStatus.none : CountryStatus.visited);
+                    },
+                    child: Text(isVisited ? 'Visité ✓' : 'Marquer visité'),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isWish ? AppTheme.countryWishlist : AppTheme.panelBg,
-                        foregroundColor: isWish ? AppTheme.ink1 : AppTheme.textColor,
-                        side: BorderSide(color: isWish ? AppTheme.countryWishlist : AppTheme.mapStroke),
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                      ),
-                      onPressed: () {
-                        provider.markCountryStatus(selectedId, isWish ? CountryStatus.none : CountryStatus.wishlist);
-                      },
-                      child: Text(isWish ? 'Envie ✓' : 'Envie d\'y aller'),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isLived ? AppTheme.countryLived : AppTheme.panelBg,
+                      foregroundColor: isLived ? AppTheme.ink1 : AppTheme.textColor,
+                      side: BorderSide(color: isLived ? AppTheme.countryLived : AppTheme.mapStroke),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                     ),
+                    onPressed: () {
+                      provider.markCountryStatus(selectedId, isLived ? CountryStatus.none : CountryStatus.lived);
+                    },
+                    child: Text(isLived ? 'Habité ✓' : 'Marquer habité'),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isWish ? AppTheme.countryWishlist : AppTheme.panelBg,
+                      foregroundColor: isWish ? AppTheme.ink1 : AppTheme.textColor,
+                      side: BorderSide(color: isWish ? AppTheme.countryWishlist : AppTheme.mapStroke),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    ),
+                    onPressed: () {
+                      provider.markCountryStatus(selectedId, isWish ? CountryStatus.none : CountryStatus.wishlist);
+                    },
+                    child: Text(isWish ? 'Envie ✓' : 'Envie d\'y aller'),
                   ),
                 ],
               ),

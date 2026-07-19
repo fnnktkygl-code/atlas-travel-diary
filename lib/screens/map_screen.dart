@@ -17,7 +17,8 @@ class MapScreen extends StatelessWidget {
     final countryInfo = countriesData[countryId];
     final name = countryInfo?.name ?? countryId;
     final currentData = provider.userData[countryId];
-    final isVisited = currentData?.status == CountryStatus.visited || currentData?.status == CountryStatus.lived;
+    final isVisited = currentData?.status == CountryStatus.visited;
+    final isLived = currentData?.status == CountryStatus.lived;
     final isWish = currentData?.status == CountryStatus.wishlist;
 
     showModalBottomSheet(
@@ -52,6 +53,20 @@ class MapScreen extends StatelessWidget {
                 ),
                 onPressed: () {
                   provider.markCountryStatus(countryId, isVisited ? CountryStatus.none : CountryStatus.visited);
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.home),
+                label: Text(isLived ? 'Déjà marqué comme habité' : 'Marquer comme habité'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isLived ? AppTheme.countryLived : AppTheme.panelBg,
+                  foregroundColor: isLived ? AppTheme.ink1 : AppTheme.textColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                onPressed: () {
+                  provider.markCountryStatus(countryId, isLived ? CountryStatus.none : CountryStatus.lived);
                   Navigator.pop(context);
                 },
               ),
