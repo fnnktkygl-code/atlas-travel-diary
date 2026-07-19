@@ -29,7 +29,8 @@ class DetailPanel extends StatelessWidget {
         final name = countryInfo?.name ?? selectedId;
         
         final currentData = provider.userData[selectedId];
-        final isVisited = currentData?.status == CountryStatus.visited || currentData?.status == CountryStatus.lived;
+        final isVisited = currentData?.status == CountryStatus.visited;
+        final isLived = currentData?.status == CountryStatus.lived;
         final isWish = currentData?.status == CountryStatus.wishlist;
 
         return PanelWidget(
