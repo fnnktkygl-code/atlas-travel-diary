@@ -57,4 +57,9 @@ class HiveRepository {
   static Future<void> removeEntry(String entryId) async {
     await _eBox.delete(entryId);
   }
+
+  static Future<void> clearAll() async {
+    await _cBox.clear();
+    await _eBox.clear();
+  }
 }

@@ -127,10 +127,10 @@ class MapProvider extends ChangeNotifier {
         }
       });
     } else {
-      // User logged out, revert to local only or clear
-      _userData = HiveRepository.loadUserData();
-      _entries = HiveRepository.loadEntries();
-      _entries.sort((a, b) => b.date.compareTo(a.date));
+      // User logged out, clear local data
+      HiveRepository.clearAll();
+      _userData = {};
+      _entries = [];
       notifyListeners();
     }
   }

@@ -213,8 +213,13 @@ class UserProfileModal extends StatelessWidget {
                         foregroundColor: Theme.of(context).colorScheme.surfaceTint,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(context);
+                        try {
+                          await authProvider.signInWithGoogle();
+                        } catch (e) {
+                          debugPrint('Login failed: $e');
+                        }
                       },
                     ),
                 ],
