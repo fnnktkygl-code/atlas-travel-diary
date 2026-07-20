@@ -25,6 +25,7 @@ class SidebarWidget extends StatelessWidget {
           const DetailPanel(),
           const JournalPanel(),
           _buildWishlistPanel(),
+          _buildRedlistPanel(),
         ],
       ),
     );
@@ -64,6 +65,42 @@ class SidebarWidget extends StatelessWidget {
                     );
                   }).toList(),
                 ),
+        );
+      },
+    );
+  }
+
+  Widget _buildRedlistPanel() {
+    return Consumer<MapProvider>(
+      builder: (context, provider, child) {
+        final redlistIds = provider.userData.entries
+            .where((e) => e.value.status == CountryStatus.redlist)
+            .map((e) => e.key)
+            .toList();
+
+        if (redlistIds.isEmpty) return const SizedBox.shrink(); // Hide panel if empty to save space
+
+        return PanelWidget(
+          title: 'Liste rouge',
+          trailing: Text(
+            '${redlistIds.length}',
+            style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+          ),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: redlistIds.map((id) {
+              final name = countriesData[id]?.name ?? id;
+              return ActionChip(
+                label: Text(name, style: const TextStyle(color: AppTheme.textColor)),
+                backgroundColor: AppTheme.countryRedlistHover.withValues(alpha: 0.1),
+                side: BorderSide(color: AppTheme.countryRedlistHover.withValues(alpha: 0.5)),
+                onPressed: () {
+                  provider.selectCountry(id);
+                },
+              );
+            }).toList(),
+          ),
         );
       },
     );
