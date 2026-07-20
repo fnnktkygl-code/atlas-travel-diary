@@ -171,7 +171,7 @@ class MapProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> resetAccount(BuildContext context) async {
+  Future<bool> resetAccount(BuildContext context) async {
     final uid = authProvider.uid;
     final countryKeys = _userData.keys.toList();
     final entryKeys = _entries.map((e) => e.id).toList();
@@ -184,16 +184,28 @@ class MapProvider extends ChangeNotifier {
     if (uid != null) {
       try {
         await _firestoreService.deleteSpecificData(uid, countryKeys, entryKeys);
-        // Also call resetUserData just in case there are orphaned documents on the server
         await _firestoreService.resetUserData(uid);
+        return true;
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Firebase error: $e'), backgroundColor: Colors.red, duration: const Duration(seconds: 10)),
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Erreur Fatale Firebase'),
+              content: Text(e.toString()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('OK'),
+                )
+              ],
+            ),
           );
         }
+        return false;
       }
     }
+    return true;
   }
 
   void selectCountry(String countryId) {

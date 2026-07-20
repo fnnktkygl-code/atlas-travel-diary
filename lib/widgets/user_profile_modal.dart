@@ -184,8 +184,8 @@ class UserProfileModal extends StatelessWidget {
 
                       if (confirm == true && context.mounted) {
                         final provider = Provider.of<MapProvider>(context, listen: false);
-                        await provider.resetAccount(context);
-                        if (context.mounted) Navigator.pop(context);
+                        final success = await provider.resetAccount(context);
+                        if (success && context.mounted) Navigator.pop(context);
                       }
                     },
                   ),
