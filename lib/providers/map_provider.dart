@@ -106,16 +106,11 @@ class MapProvider extends ChangeNotifier {
           }
         } else {
           _isMigratedToCloud = true; // Mark as migrated since we are connected to cloud
-          // Merge local guest data into cloud data
-          for (final localEntry in _userData.entries) {
-            if (!cloudData.containsKey(localEntry.key)) {
-              _firestoreService.saveUserCountry(uid, localEntry.value);
-              cloudData[localEntry.key] = localEntry.value;
-            }
-          }
-          // Sync cloud to local map
+          
+          // Sync cloud to local map (overriding local)
           _userData = cloudData;
           _migrateLegacyEntries(); // ensure we migrate any legacy cloud data that just synced down
+          
           notifyListeners();
           
           // Optionally sync back to Hive for offline cache
@@ -131,13 +126,6 @@ class MapProvider extends ChangeNotifier {
             _firestoreService.saveUserEntry(uid, e);
           }
         } else {
-          // Merge local guest entries into cloud
-          for (final localEntry in _entries) {
-            if (!cloudEntries.any((e) => e.id == localEntry.id)) {
-              _firestoreService.saveUserEntry(uid, localEntry);
-              cloudEntries.add(localEntry);
-            }
-          }
           _entries = cloudEntries;
           _entries.sort((a, b) => b.date.compareTo(a.date));
           notifyListeners();
