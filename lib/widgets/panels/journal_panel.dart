@@ -46,9 +46,6 @@ class JournalPanel extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final data = journalEntries[index];
                     final name = countriesData[data.code]?.getName(localeProvider.currentLocale) ?? data.code;
-                    final dateStr = data.date != null
-                        ? '${data.date!.day}/${data.date!.month}/${data.date!.year}'
-                        : '';
                     
                       return InkWell(
                         onTap: () => provider.selectCountry(data.code),
@@ -74,23 +71,15 @@ class JournalPanel extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(width: 8),
-                                      Text(
-                                        name,
-                                        style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurface,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                    Text(
+                                      name,
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurface,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                    ],
-                                  ),
-                                  Text(
-                                    dateStr,
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               if (data.cities.isNotEmpty) ...[
                                 const SizedBox(height: 4),

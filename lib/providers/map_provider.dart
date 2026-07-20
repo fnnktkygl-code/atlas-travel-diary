@@ -93,7 +93,6 @@ class MapProvider extends ChangeNotifier {
     final newData = UserCountryData(
       code: countryId,
       status: status,
-      date: DateTime.now(),
       cities: existing?.cities ?? const [],
     );
     
