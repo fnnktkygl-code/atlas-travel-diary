@@ -5,7 +5,7 @@ Bienvenue sur le dépôt de **Atlas Travel Diary** !
 ## 🌍 Accéder à l'application web
 
 L'application est déployée et accessible en ligne :
-👉 **[Lien vers l'application web (Vercel)](https://atlas-ashy-six.vercel.app)**
+👉 **[Lien vers l'application web (Vercel)](https://atlas-ashy-six.vercel.app/)**
 
 ---
 ## Getting Started
