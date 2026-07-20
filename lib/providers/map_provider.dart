@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import '../models/map_models.dart';
 import '../data_providers/hive_repository.dart';
 import '../services/firestore_service.dart';
+import '../services/cloudinary_service.dart';
 import 'auth_provider.dart';
 
 class MapProvider extends ChangeNotifier {
   final AuthProvider authProvider;
   final FirestoreService _firestoreService = FirestoreService();
+  final CloudinaryService _cloudinaryService = CloudinaryService();
   
   Map<String, UserCountryData> _userData = {};
   String? _selectedCountryId;
@@ -175,12 +177,10 @@ class MapProvider extends ChangeNotifier {
 
     if (authProvider.uid != null) {
       _firestoreService.saveUserCountry(authProvider.uid!, newData);
-      _firestoreService.deletePhoto(photoUrl);
     }
   }
 
   Future<String?> uploadPhoto(String countryId, Uint8List fileBytes, String fileName) async {
-    if (authProvider.uid == null) return null;
-    return await _firestoreService.uploadPhoto(authProvider.uid!, countryId, fileBytes, fileName);
+    return await _cloudinaryService.uploadPhoto(fileBytes, fileName);
   }
 }
