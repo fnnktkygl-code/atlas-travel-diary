@@ -112,6 +112,15 @@ class UserProfileModal extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 32),
+                  if (authProvider.errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(
+                        "Erreur Firebase : ${authProvider.errorMessage}",
+                        style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   if (authProvider.uid != null)
                     ElevatedButton.icon(
                       icon: const Icon(Icons.logout),
