@@ -169,7 +169,7 @@ class MapProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> resetAccount() async {
+  Future<void> resetAccount(BuildContext context) async {
     _userData.clear();
     _entries.clear();
     await HiveRepository.clearAll();
@@ -177,7 +177,15 @@ class MapProvider extends ChangeNotifier {
 
     final uid = authProvider.uid;
     if (uid != null) {
-      await _firestoreService.resetUserData(uid);
+      try {
+        await _firestoreService.resetUserData(uid);
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Firebase error: $e'), backgroundColor: Colors.red, duration: const Duration(seconds: 10)),
+          );
+        }
+      }
     }
   }
 

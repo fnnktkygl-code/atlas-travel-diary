@@ -1,0 +1,4 @@
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccountKey.json'); // I don't have it
+
+// wait, I don't have their service account key.
