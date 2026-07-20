@@ -249,6 +249,28 @@ class _EntriesSection extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(entry.note, maxLines: 2, overflow: TextOverflow.ellipsis),
                       ],
+                      if (entry.photoUrls.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: 60,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: entry.photoUrls.length,
+                            separatorBuilder: (context, _) => const SizedBox(width: 8),
+                            itemBuilder: (context, photoIndex) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: Image.network(
+                                  entry.photoUrls[photoIndex],
+                                  height: 60,
+                                  width: 60,
+                                  fit: BoxFit.cover,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                   trailing: IconButton(
