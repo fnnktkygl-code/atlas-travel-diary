@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:path_drawing/path_drawing.dart';
 import '../data/world_map_paths.dart';
 import '../models/map_models.dart';
+import '../data/countries.dart';
+import '../theme/app_theme.dart';
 import 'world_map_painter.dart';
 
 class WorldMapWidget extends StatefulWidget {
@@ -115,41 +117,76 @@ class _WorldMapWidgetState extends State<WorldMapWidget> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Compute initial scale to fit the map horizontally
-        final initialScale = constraints.maxWidth / _mapWidth;
-        // Optionally center vertically if the screen is tall
-        
-        return InteractiveViewer(
-          transformationController: _transformationController,
-          constrained: false, // Let the map be its actual 1000x500 size
-          minScale: initialScale * 0.5,
-          maxScale: initialScale * 10,
-          boundaryMargin: EdgeInsets.all(_mapWidth / 2),
-          child: MouseRegion(
-            onHover: _handleHover,
-            onExit: (_) {
-              setState(() {
-                _hoveredCountryId = null;
-              });
-            },
-            child: GestureDetector(
-              onTapUp: _handleTap,
-              onDoubleTapDown: _handleDoubleTapDown,
-              onDoubleTap: _handleDoubleTap,
-              child: CustomPaint(
-                size: const Size(_mapWidth, _mapHeight),
-                painter: WorldMapPainter(
-                  parsedGroups: _parsedGroups!,
-                  userData: widget.userData,
-                  hoveredCountryId: _hoveredCountryId,
+    return Stack(
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) {
+            // Compute initial scale to fit the map horizontally
+            final initialScale = constraints.maxWidth / _mapWidth;
+            
+            return InteractiveViewer(
+              transformationController: _transformationController,
+              constrained: false, // Let the map be its actual 1000x500 size
+              minScale: initialScale * 0.5,
+              maxScale: initialScale * 10,
+              boundaryMargin: EdgeInsets.all(_mapWidth / 2),
+              child: MouseRegion(
+                onHover: _handleHover,
+                onExit: (_) {
+                  setState(() {
+                    _hoveredCountryId = null;
+                  });
+                },
+                child: GestureDetector(
+                  onTapUp: _handleTap,
+                  onDoubleTapDown: _handleDoubleTapDown,
+                  onDoubleTap: _handleDoubleTap,
+                  child: CustomPaint(
+                    size: const Size(_mapWidth, _mapHeight),
+                    painter: WorldMapPainter(
+                      parsedGroups: _parsedGroups!,
+                      userData: widget.userData,
+                      hoveredCountryId: _hoveredCountryId,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        if (_hoveredCountryId != null)
+          Positioned(
+            bottom: 32,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme.panelBg.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppTheme.mapStroke),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  countriesData[_hoveredCountryId!]?.name ?? _hoveredCountryId!,
+                  style: const TextStyle(
+                    fontFamily: 'Fraunces',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textColor,
+                  ),
                 ),
               ),
             ),
           ),
-        );
-      }
+      ],
     );
   }
 }

@@ -115,6 +115,33 @@ class DetailPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              if (isRedlist) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.countryRedlistHover.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppTheme.countryRedlistHover.withValues(alpha: 0.2)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.info_outline, color: AppTheme.countryRedlistHover, size: 20),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Ce pays est exclu de vos statistiques globales de surface et de complétion du monde.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.textColor,
+                            height: 1.3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               if (currentData != null && (currentData.status == CountryStatus.visited || currentData.status == CountryStatus.lived)) ...[
                 const SizedBox(height: 24),
                 _CitiesSection(

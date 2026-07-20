@@ -4,6 +4,7 @@ import '../providers/map_provider.dart';
 import '../widgets/world_map_widget.dart';
 import '../widgets/stat_strip.dart';
 import '../widgets/sidebar_widget.dart';
+import '../widgets/user_profile_modal.dart';
 
 import '../models/map_models.dart';
 import '../data/countries.dart';
@@ -117,6 +118,14 @@ class MapScreen extends StatelessWidget {
         title: const Text('Atlas - Carnet de voyage'),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            onPressed: () {
+              UserProfileModal.show(context);
+            },
+          ),
+        ],
       ),
       body: Consumer<MapProvider>(
         builder: (context, provider, child) {
