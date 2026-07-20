@@ -49,47 +49,65 @@ class JournalPanel extends StatelessWidget {
                         ? '${data.date!.day}/${data.date!.month}/${data.date!.year}'
                         : '';
                     
-                    return InkWell(
-                      onTap: () => provider.selectCountry(data.code),
-                      borderRadius: BorderRadius.circular(6),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: data.status == CountryStatus.visited
-                                        ? AppTheme.countryVisited
-                                        : AppTheme.countryLived,
-                                    shape: BoxShape.circle,
+                      return InkWell(
+                        onTap: () => provider.selectCountry(data.code),
+                        borderRadius: BorderRadius.circular(6),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: BoxDecoration(
+                                          color: data.status == CountryStatus.visited
+                                              ? AppTheme.countryVisited
+                                              : AppTheme.countryLived,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        name,
+                                        style: const TextStyle(
+                                          color: AppTheme.textColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  name,
-                                  style: const TextStyle(
-                                    color: AppTheme.textColor,
-                                    fontWeight: FontWeight.w500,
+                                  Text(
+                                    dateStr,
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (data.cities.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Text(
+                                    data.cities.join(' • '),
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                               ],
-                            ),
-                            Text(
-                              dateStr,
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
+                      );
                   },
                 ),
         );
