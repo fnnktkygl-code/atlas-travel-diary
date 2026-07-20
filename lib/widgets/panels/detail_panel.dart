@@ -21,9 +21,9 @@ class DetailPanel extends StatelessWidget {
         
         if (selectedId == null) {
           return PanelWidget(
-            title: 'Pays sélectionné', // We could translate this too but let's just do it
+            title: tr(context, 'country_selected'),
             child: Text(
-              'Cliquez sur un pays de la carte, ou utilisez la recherche, pour voir ses détails et ajouter un voyage.',
+              tr(context, 'country_selected_empty'),
               style: const TextStyle(color: Colors.grey, fontSize: 13),
             ),
           );
@@ -39,7 +39,7 @@ class DetailPanel extends StatelessWidget {
         final isRedlist = currentData?.status == CountryStatus.redlist;
 
         return PanelWidget(
-          title: 'Pays sélectionné',
+          title: tr(context, 'country_selected'),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

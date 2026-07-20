@@ -53,6 +53,8 @@ const Map<String, Map<String, String>> translations = {
     'auth_subtitle': 'Votre carnet de voyage synchronisé',
     'auth_google': 'Se connecter avec Google',
     'error_login': 'Erreur de connexion',
+    'country_selected': 'Pays sélectionné',
+    'country_selected_empty': 'Cliquez sur un pays de la carte, ou utilisez la recherche, pour voir ses détails et ajouter un voyage.',
   },
   'en': {
     'app_title': 'Atlas - Travel Diary',
@@ -108,6 +110,8 @@ const Map<String, Map<String, String>> translations = {
     'auth_subtitle': 'Your synchronized travel diary',
     'auth_google': 'Sign in with Google',
     'error_login': 'Login error',
+    'country_selected': 'Selected country',
+    'country_selected_empty': 'Click on a country on the map, or use search, to view its details and add a trip.',
   },
   'es': {
     'app_title': 'Atlas - Diario de viaje',
@@ -163,5 +167,7 @@ const Map<String, Map<String, String>> translations = {
     'auth_subtitle': 'Tu diario de viaje sincronizado',
     'auth_google': 'Iniciar sesión con Google',
     'error_login': 'Error de inicio de sesión',
+    'country_selected': 'País seleccionado',
+    'country_selected_empty': 'Haz clic en un país del mapa o usa la búsqueda para ver sus detalles y agregar un viaje.',
   },
 };
