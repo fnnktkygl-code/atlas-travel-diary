@@ -45,6 +45,9 @@ const Map<String, Map<String, String>> translations = {
     'remove_country': 'Supprimer ce pays',
     'dark_mode': 'Mode Sombre',
     'photos': 'Photos',
+    'geo_title': 'Centrage automatique',
+    'geo_desc': 'Centrer la carte sur ma position actuelle',
+    'search_hint': "Tapez le nom d'un pays...",
   },
   'en': {
     'app_title': 'Atlas - Travel Diary',
@@ -92,6 +95,9 @@ const Map<String, Map<String, String>> translations = {
     'remove_country': 'Remove this country',
     'dark_mode': 'Dark Mode',
     'photos': 'Photos',
+    'geo_title': 'Auto-centering',
+    'geo_desc': 'Center the map on my current location',
+    'search_hint': 'Type a country name...',
   },
   'es': {
     'app_title': 'Atlas - Diario de viaje',
@@ -139,5 +145,8 @@ const Map<String, Map<String, String>> translations = {
     'remove_country': 'Eliminar este país',
     'dark_mode': 'Modo Oscuro',
     'photos': 'Fotos',
+    'geo_title': 'Centrado automático',
+    'geo_desc': 'Centrar el mapa en mi ubicación actual',
+    'search_hint': 'Escribe el nombre de un país...',
   },
 };
