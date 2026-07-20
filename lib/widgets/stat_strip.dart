@@ -16,6 +16,7 @@ class StatStrip extends StatelessWidget {
         int wishlist = 0;
         int lived = 0;
         int redlistCount = 0;
+        int citiesCount = 0;
         
         double exploredArea = 0.0;
         double redlistArea = 0.0;
@@ -33,9 +34,11 @@ class StatStrip extends StatelessWidget {
           if (status == CountryStatus.visited) {
             visited++;
             exploredArea += area;
+            citiesCount += entry.value.cities.length;
           } else if (status == CountryStatus.lived) {
             lived++;
             exploredArea += area;
+            citiesCount += entry.value.cities.length;
           } else if (status == CountryStatus.wishlist) {
             wishlist++;
           } else if (status == CountryStatus.redlist) {
@@ -60,11 +63,10 @@ class StatStrip extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _buildCell('pays visités', '$totalExplored', false),
+              _buildCell('pays explorés', '$totalExplored', false),
               _buildCell('% pays monde', '$pctCountries%', true),
               _buildCell('% surface monde', '$pctArea%', true),
-              _buildCell('envies de voyage', '$wishlist', false),
-              if (redlistCount > 0) _buildCell('liste rouge', '$redlistCount', false),
+              _buildCell('villes visitées', '$citiesCount', false),
             ],
           ),
         );

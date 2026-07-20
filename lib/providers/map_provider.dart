@@ -86,10 +86,12 @@ class MapProvider extends ChangeNotifier {
   }
 
   void markCountryStatus(String countryId, CountryStatus status) {
+    final existing = _userData[countryId];
     final newData = UserCountryData(
       code: countryId,
       status: status,
       date: DateTime.now(),
+      cities: existing?.cities ?? const [],
     );
     
     // Update local immediately for responsive UI
@@ -116,6 +118,18 @@ class MapProvider extends ChangeNotifier {
       _firestoreService.removeUserCountry(uid, countryId);
     }
   }
+
+  void updateCities(String countryId, List<String> cities) {
+    final existing = _userData[countryId];
+    if (existing == null) return;
+    
+    final newData = existing.copyWith(cities: cities);
+    _userData[countryId] = newData;
+    HiveRepository.saveUserData(newData);
+    notifyListeners();
+
+    if (authProvider.uid != null) {
+      _firestoreService.saveUserCountry(authProvider.uid!, newData);
+    }
+  }
 }
-
-

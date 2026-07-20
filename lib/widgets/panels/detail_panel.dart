@@ -115,6 +115,14 @@ class DetailPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              if (currentData != null && (currentData.status == CountryStatus.visited || currentData.status == CountryStatus.lived)) ...[
+                const SizedBox(height: 24),
+                _CitiesSection(
+                  countryId: selectedId,
+                  cities: currentData.cities,
+                  provider: provider,
+                ),
+              ],
               if (currentData != null && currentData.status != CountryStatus.none) ...[
                 const SizedBox(height: 16),
                 const Divider(color: AppTheme.mapStroke),
@@ -133,6 +141,99 @@ class DetailPanel extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+class _CitiesSection extends StatefulWidget {
+  final String countryId;
+  final List<String> cities;
+  final MapProvider provider;
+
+  const _CitiesSection({
+    Key? key,
+    required this.countryId,
+    required this.cities,
+    required this.provider,
+  }) : super(key: key);
+
+  @override
+  State<_CitiesSection> createState() => _CitiesSectionState();
+}
+
+class _CitiesSectionState extends State<_CitiesSection> {
+  final TextEditingController _controller = TextEditingController();
+
+  void _addCity(String val) {
+    final text = val.trim();
+    if (text.isNotEmpty && !widget.cities.contains(text)) {
+      final newCities = List<String>.from(widget.cities)..add(text);
+      widget.provider.updateCities(widget.countryId, newCities);
+      _controller.clear();
+    }
+  }
+
+  void _removeCity(String city) {
+    final newCities = List<String>.from(widget.cities)..remove(city);
+    widget.provider.updateCities(widget.countryId, newCities);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Villes visitées',
+          style: TextStyle(
+            color: AppTheme.textColor,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: widget.cities.map((city) {
+            return Chip(
+              label: Text(city),
+              onDeleted: () => _removeCity(city),
+              backgroundColor: AppTheme.mapStroke,
+              deleteIconColor: Colors.grey,
+              side: BorderSide.none,
+              labelStyle: const TextStyle(fontSize: 13),
+              padding: const EdgeInsets.all(4),
+            );
+          }).toList(),
+        ),
+        if (widget.cities.isNotEmpty) const SizedBox(height: 12),
+        TextField(
+          controller: _controller,
+          style: const TextStyle(fontSize: 14),
+          decoration: InputDecoration(
+            hintText: 'Ajouter une ville (Entrée pour valider)',
+            hintStyle: const TextStyle(color: Colors.grey),
+            filled: true,
+            fillColor: AppTheme.mapBg,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.add_circle, color: AppTheme.countryVisited),
+              onPressed: () => _addCity(_controller.text),
+            ),
+          ),
+          onSubmitted: _addCity,
+        ),
+      ],
     );
   }
 }
