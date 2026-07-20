@@ -82,4 +82,20 @@ class FirestoreService {
         .doc(entryId)
         .delete();
   }
+
+  Future<void> resetUserData(String uid) async {
+    final batch = _db.batch();
+    
+    final countries = await _db.collection('users').doc(uid).collection('countries').get();
+    for (var doc in countries.docs) {
+      batch.delete(doc.reference);
+    }
+    
+    final entries = await _db.collection('users').doc(uid).collection('entries').get();
+    for (var doc in entries.docs) {
+      batch.delete(doc.reference);
+    }
+    
+    await batch.commit();
+  }
 }

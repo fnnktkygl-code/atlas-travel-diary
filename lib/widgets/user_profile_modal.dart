@@ -155,6 +155,40 @@ class UserProfileModal extends StatelessWidget {
                         }
                       },
                     ),
+                  const SizedBox(height: 16),
+                  TextButton.icon(
+                    icon: const Icon(Icons.delete_forever),
+                    label: const Text('Réinitialiser toutes mes données'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Êtes-vous sûr ?'),
+                          content: const Text('Cette action supprimera toutes vos données de la carte et de votre journal, de manière irréversible.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx, false),
+                              child: const Text('Annuler'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx, true),
+                              style: TextButton.styleFrom(foregroundColor: Colors.red),
+                              child: const Text('Réinitialiser'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true && context.mounted) {
+                        final provider = Provider.of<MapProvider>(context, listen: false);
+                        await provider.resetAccount();
+                        if (context.mounted) Navigator.pop(context);
+                      }
+                    },
+                  ),
                 ],
               );
             },

@@ -169,6 +169,18 @@ class MapProvider extends ChangeNotifier {
     super.dispose();
   }
 
+  Future<void> resetAccount() async {
+    final uid = authProvider.uid;
+    if (uid != null) {
+      await _firestoreService.resetUserData(uid);
+    }
+    
+    _userData.clear();
+    _entries.clear();
+    await HiveRepository.clearCache();
+    notifyListeners();
+  }
+
   void selectCountry(String countryId) {
     _selectedCountryId = countryId;
     notifyListeners();
