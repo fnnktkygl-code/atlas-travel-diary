@@ -43,7 +43,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       if (kIsWeb) {
         GoogleAuthProvider authProvider = GoogleAuthProvider();
-        await _auth.signInWithRedirect(authProvider);
+        await _auth.signInWithPopup(authProvider);
       } else {
         final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
         if (googleUser == null) return; // User canceled the sign-in
@@ -58,7 +58,8 @@ class AuthProvider extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint("Error signing in with Google: $e");
-      rethrow;
+      errorMessage = e.toString();
+      notifyListeners();
     }
   }
 
