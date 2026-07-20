@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/map_models.dart';
 import '../providers/map_provider.dart';
 import '../providers/locale_provider.dart';
@@ -29,6 +30,9 @@ class _EntryEditorScreenState extends State<EntryEditorScreen> {
   late DateTime _selectedDate;
   
   List<String> _photos = [];
+  bool _isUploading = false;
+  final ImagePicker _picker = ImagePicker();
+  final Uuid _uuid = const Uuid();
 
   @override
   void initState() {
@@ -41,8 +45,6 @@ class _EntryEditorScreenState extends State<EntryEditorScreen> {
     _photos = e != null ? List.from(e.photoUrls) : [];
   }
 
-  bool _isUploading = false;
-
   @override
   void dispose() {
     _titleController.dispose();
@@ -52,10 +54,18 @@ class _EntryEditorScreenState extends State<EntryEditorScreen> {
   }
 
   Future<void> _pickAndUploadImage() async {
-    final provider = Provider.of<MapProvider>(context, listen: false);
-    setState(() => _isUploading = true);
     try {
-      final url = await provider.uploadPhotoWithPicker(widget.countryCode);
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      setState(() => _isUploading = true);
+
+      final bytes = await image.readAsBytes();
+      final extension = image.name.split('.').last;
+      final fileName = '${_uuid.v4()}.$extension';
+
+      final provider = Provider.of<MapProvider>(context, listen: false);
+      final url = await provider.uploadPhoto(widget.countryCode, bytes, fileName);
       if (url != null) {
         setState(() {
           _photos.add(url);
@@ -68,7 +78,7 @@ class _EntryEditorScreenState extends State<EntryEditorScreen> {
         );
       }
     } finally {
-      setState(() => _isUploading = false);
+      if (mounted) setState(() => _isUploading = false);
     }
   }
 
