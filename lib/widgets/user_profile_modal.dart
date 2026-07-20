@@ -66,84 +66,6 @@ class UserProfileModal extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
-                  
-                  // Language Selector
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.language, color: Colors.grey),
-                            const SizedBox(width: 8),
-                            Text(
-                              tr(context, 'language'),
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
-                            ),
-                          ],
-                        ),
-                        Consumer<LocaleProvider>(
-                          builder: (context, localeProvider, child) {
-                            return DropdownButton<String>(
-                              value: localeProvider.currentLocale,
-                              underline: const SizedBox(),
-                              dropdownColor: Theme.of(context).cardColor,
-                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                              items: [
-                                DropdownMenuItem(value: 'fr', child: Text(tr(context, 'language_fr'))),
-                                DropdownMenuItem(value: 'en', child: Text(tr(context, 'language_en'))),
-                                DropdownMenuItem(value: 'es', child: Text(tr(context, 'language_es'))),
-                              ],
-                              onChanged: (val) {
-                                if (val != null) localeProvider.setLocale(val);
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Theme Selector
-                  Consumer<ThemeProvider>(
-                    builder: (context, themeProvider, child) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(themeProvider.isDark ? Icons.dark_mode : Icons.light_mode, color: Colors.grey),
-                                const SizedBox(width: 8),
-                                Text(
-                                  tr(context, 'dark_mode'),
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
-                                ),
-                              ],
-                            ),
-                            Switch(
-                              value: themeProvider.isDark,
-                              activeThumbColor: AppTheme.countryVisited,
-                              onChanged: (_) => themeProvider.toggleTheme(),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 32),
-
                   Text(
                     tr(context, 'profile_stats_title'),
                     style: TextStyle(
@@ -213,13 +135,12 @@ class UserProfileModal extends StatelessWidget {
                         foregroundColor: Theme.of(context).colorScheme.surfaceTint,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      onPressed: () async {
-                        Navigator.pop(context);
-                        try {
-                          await authProvider.signInWithGoogle();
-                        } catch (e) {
+                      onPressed: () {
+                        authProvider.signInWithGoogle().then((_) {
+                          if (context.mounted) Navigator.pop(context);
+                        }).catchError((e) {
                           debugPrint('Login failed: $e');
-                        }
+                        });
                       },
                     ),
                 ],

@@ -11,6 +11,7 @@ import '../models/map_models.dart';
 import '../data/countries.dart';
 import '../theme/app_theme.dart';
 import '../providers/locale_provider.dart';
+import '../providers/theme_provider.dart';
 
 class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
@@ -122,6 +123,27 @@ class MapScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          Consumer<LocaleProvider>(
+            builder: (context, localeProvider, child) {
+              return PopupMenuButton<String>(
+                icon: const Icon(Icons.language),
+                onSelected: (val) => localeProvider.setLocale(val),
+                itemBuilder: (context) => [
+                  PopupMenuItem(value: 'fr', child: Text(tr(context, 'language_fr'))),
+                  PopupMenuItem(value: 'en', child: Text(tr(context, 'language_en'))),
+                  PopupMenuItem(value: 'es', child: Text(tr(context, 'language_es'))),
+                ],
+              );
+            },
+          ),
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return IconButton(
+                icon: Icon(themeProvider.isDark ? Icons.light_mode : Icons.dark_mode),
+                onPressed: () => themeProvider.toggleTheme(),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.person_outline),
             onPressed: () {
