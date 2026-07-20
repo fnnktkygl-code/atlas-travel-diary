@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/map_provider.dart';
+import '../providers/locale_provider.dart';
 import '../models/map_models.dart';
 import '../theme/app_theme.dart';
 import '../data/countries.dart';
@@ -13,7 +14,6 @@ class StatStrip extends StatelessWidget {
     return Consumer<MapProvider>(
       builder: (context, provider, child) {
         int visited = 0;
-        int wishlist = 0;
         int lived = 0;
         int redlistCount = 0;
         int citiesCount = 0;
@@ -39,8 +39,6 @@ class StatStrip extends StatelessWidget {
             lived++;
             exploredArea += area;
             citiesCount += entry.value.cities.length;
-          } else if (status == CountryStatus.wishlist) {
-            wishlist++;
           } else if (status == CountryStatus.redlist) {
             redlistCount++;
             redlistArea += area;
@@ -57,16 +55,16 @@ class StatStrip extends StatelessWidget {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
           decoration: BoxDecoration(
-            color: AppTheme.mapStroke,
-            border: Border.all(color: AppTheme.mapStroke),
+            color: Theme.of(context).colorScheme.outline,
+            border: Border.all(color: Theme.of(context).colorScheme.outline),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
             children: [
-              _buildCell('pays explorés', '$totalExplored', false),
-              _buildCell('% pays monde', '$pctCountries%', true),
-              _buildCell('% surface monde', '$pctArea%', true),
-              _buildCell('villes visitées', '$citiesCount', false),
+              _buildCell(context, tr(context, 'stat_visited'), '$totalExplored', false),
+              _buildCell(context, tr(context, 'world_completion'), '$pctCountries%', true),
+              _buildCell(context, tr(context, 'world_area'), '$pctArea%', true),
+              _buildCell(context, tr(context, 'visited_cities'), '$citiesCount', false),
             ],
           ),
         );
@@ -74,12 +72,12 @@ class StatStrip extends StatelessWidget {
     );
   }
 
-  Widget _buildCell(String label, String value, bool bump) {
+  Widget _buildCell(BuildContext context, String label, String value, bool bump) {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.only(right: 1), // gap
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-        color: AppTheme.mapBg,
+        color: Theme.of(context).colorScheme.surface,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -89,7 +87,7 @@ class StatStrip extends StatelessWidget {
                 fontFamily: 'Outfit',
                 fontSize: 26,
                 fontWeight: FontWeight.w600,
-                color: bump ? const Color(0xFFFBBF24) : AppTheme.textColor,
+                color: bump ? const Color(0xFFFBBF24) : Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 2),

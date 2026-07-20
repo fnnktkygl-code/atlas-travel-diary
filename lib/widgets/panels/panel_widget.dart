@@ -19,8 +19,8 @@ class PanelWidget extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppTheme.panelBg,
-        border: Border.all(color: AppTheme.mapStroke),
+        color: Theme.of(context).cardColor,
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -32,11 +32,11 @@ class PanelWidget extends StatelessWidget {
               children: [
                 Text(
                   title!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Fraunces',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.textColor,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 if (trailing != null) trailing!,

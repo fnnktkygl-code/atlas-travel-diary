@@ -5,14 +5,15 @@ import '../../providers/geo_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../data/countries.dart';
 import '../../models/map_models.dart';
+import '../../providers/locale_provider.dart';
 
 class GeoPanel extends StatelessWidget {
   const GeoPanel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GeoProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<GeoProvider, LocaleProvider>(
+      builder: (context, provider, localeProvider, child) {
         return PanelWidget(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -20,22 +21,22 @@ class GeoPanel extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '📍 Détection de localisation',
+                          tr(context, 'geo_title'),
                           style: TextStyle(
-                            color: AppTheme.textColor,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'Vous propose d\'ajouter un pays quand vous y êtes',
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                          tr(context, 'geo_desc'),
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ],
                     ),
@@ -51,15 +52,15 @@ class GeoPanel extends StatelessWidget {
               if (provider.isAutoTracking) ...[
                 const SizedBox(height: 16),
                 if (provider.isLocating)
-                  const Row(
+                  Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       ),
-                      SizedBox(width: 12),
-                      Text('Recherche...', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                      const SizedBox(width: 12),
+                      Text(tr(context, 'geo_searching'), style: const TextStyle(color: Colors.grey, fontSize: 13)),
                     ],
                   )
                 else ...[
@@ -74,7 +75,7 @@ class GeoPanel extends StatelessWidget {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.countryVisited,
-                        foregroundColor: AppTheme.ink1,
+                        foregroundColor: Theme.of(context).colorScheme.surfaceTint,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                       ),
@@ -86,7 +87,7 @@ class GeoPanel extends StatelessWidget {
                         // Stop locating after marking visited
                         provider.toggleAutoTracking(false);
                       },
-                      child: Text('Marquer ${countriesData[provider.detectedCountryCode!]?.name ?? provider.detectedCountryCode!} comme visité'),
+                      child: Text('${tr(context, 'mark_visited').split(' ').first} ${countriesData[provider.detectedCountryCode!]?.getName(localeProvider.currentLocale) ?? provider.detectedCountryCode!} ${tr(context, 'visited').toLowerCase()}'),
                     ),
                   ],
                 ],

@@ -9,14 +9,16 @@ import '../widgets/user_profile_modal.dart';
 import '../models/map_models.dart';
 import '../data/countries.dart';
 import '../theme/app_theme.dart';
+import '../providers/locale_provider.dart';
 
 class MapScreen extends StatelessWidget {
-  const MapScreen({Key? key}) : super(key: key);
+  const MapScreen({super.key});
 
   void _showAddCountryModal(BuildContext context, String countryId, MapProvider provider) {
     provider.selectCountry(countryId); // Select it so sidebar updates too
     final countryInfo = countriesData[countryId];
-    final name = countryInfo?.name ?? countryId;
+    final locale = Provider.of<LocaleProvider>(context, listen: false).currentLocale;
+    final name = countryInfo?.getName(locale) ?? countryId;
     final currentData = provider.userData[countryId];
     final isVisited = currentData?.status == CountryStatus.visited;
     final isLived = currentData?.status == CountryStatus.lived;
@@ -49,8 +51,8 @@ class MapScreen extends StatelessWidget {
                 icon: const Icon(Icons.check_circle_outline),
                 label: Text(isVisited ? 'Déjà marqué comme visité' : 'Marquer comme visité'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isVisited ? AppTheme.countryVisited : AppTheme.panelBg,
-                  foregroundColor: isVisited ? AppTheme.ink1 : AppTheme.textColor,
+                  backgroundColor: isVisited ? AppTheme.countryVisited : Theme.of(context).cardColor,
+                  foregroundColor: isVisited ? Theme.of(context).colorScheme.surfaceTint : Theme.of(context).colorScheme.onSurface,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
@@ -63,8 +65,8 @@ class MapScreen extends StatelessWidget {
                 icon: const Icon(Icons.home),
                 label: Text(isLived ? 'Déjà marqué comme habité' : 'Marquer comme habité'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isLived ? AppTheme.countryLived : AppTheme.panelBg,
-                  foregroundColor: isLived ? AppTheme.ink1 : AppTheme.textColor,
+                  backgroundColor: isLived ? AppTheme.countryLived : Theme.of(context).cardColor,
+                  foregroundColor: isLived ? Theme.of(context).colorScheme.surfaceTint : Theme.of(context).colorScheme.onSurface,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
@@ -77,8 +79,8 @@ class MapScreen extends StatelessWidget {
                 icon: const Icon(Icons.favorite_border),
                 label: Text(isWish ? 'Déjà dans la liste d\'envies' : 'Ajouter à la liste d\'envies'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isWish ? AppTheme.countryWishlist : AppTheme.panelBg,
-                  foregroundColor: isWish ? AppTheme.ink1 : AppTheme.textColor,
+                  backgroundColor: isWish ? AppTheme.countryWishlist : Theme.of(context).cardColor,
+                  foregroundColor: isWish ? Theme.of(context).colorScheme.surfaceTint : Theme.of(context).colorScheme.onSurface,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
@@ -91,8 +93,8 @@ class MapScreen extends StatelessWidget {
                 icon: const Icon(Icons.block),
                 label: Text(isRedlist ? 'Déjà sur la liste rouge' : 'Ajouter à la liste rouge'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isRedlist ? AppTheme.countryRedlistHover : AppTheme.panelBg,
-                  foregroundColor: isRedlist ? Colors.white : AppTheme.textColor,
+                  backgroundColor: isRedlist ? AppTheme.countryRedlistHover : Theme.of(context).cardColor,
+                  foregroundColor: isRedlist ? Colors.white : Theme.of(context).colorScheme.onSurface,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {

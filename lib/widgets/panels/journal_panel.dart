@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'panel_widget.dart';
 import '../../providers/map_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../models/map_models.dart';
 import '../../data/countries.dart';
 import '../../theme/app_theme.dart';
@@ -11,8 +12,8 @@ class JournalPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MapProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<MapProvider, LocaleProvider>(
+      builder: (context, provider, localeProvider, child) {
         final journalEntries = provider.userData.values
             .where((data) =>
                 data.status == CountryStatus.visited ||
@@ -28,15 +29,15 @@ class JournalPanel extends StatelessWidget {
         });
 
         return PanelWidget(
-          title: 'Journal',
+          title: tr(context, 'journal'),
           trailing: Text(
             '${journalEntries.length}',
             style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
           ),
           child: journalEntries.isEmpty
-              ? const Text(
-                  'Aucun voyage consigné pour l\'instant.',
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
+              ? Text(
+                  tr(context, 'journal_empty'),
+                  style: const TextStyle(color: Colors.grey, fontSize: 13),
                 )
               : ListView.builder(
                   shrinkWrap: true,
@@ -44,7 +45,7 @@ class JournalPanel extends StatelessWidget {
                   itemCount: journalEntries.length,
                   itemBuilder: (context, index) {
                     final data = journalEntries[index];
-                    final name = countriesData[data.code]?.name ?? data.code;
+                    final name = countriesData[data.code]?.getName(localeProvider.currentLocale) ?? data.code;
                     final dateStr = data.date != null
                         ? '${data.date!.day}/${data.date!.month}/${data.date!.year}'
                         : '';
@@ -75,8 +76,8 @@ class JournalPanel extends StatelessWidget {
                                       const SizedBox(width: 8),
                                       Text(
                                         name,
-                                        style: const TextStyle(
-                                          color: AppTheme.textColor,
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onSurface,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),

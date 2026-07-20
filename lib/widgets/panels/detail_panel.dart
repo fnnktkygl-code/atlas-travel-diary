@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/map_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../models/map_models.dart';
 import '../../data/countries.dart';
+import '../../data/cities.dart';
 import 'panel_widget.dart';
 import '../../theme/app_theme.dart';
 
@@ -11,22 +13,22 @@ class DetailPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MapProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<MapProvider, LocaleProvider>(
+      builder: (context, provider, localeProvider, child) {
         final selectedId = provider.selectedCountryId;
         
         if (selectedId == null) {
-          return const PanelWidget(
-            title: 'Pays sélectionné',
+          return PanelWidget(
+            title: 'Pays sélectionné', // We could translate this too but let's just do it
             child: Text(
               'Cliquez sur un pays de la carte, ou utilisez la recherche, pour voir ses détails et ajouter un voyage.',
-              style: TextStyle(color: Colors.grey, fontSize: 13),
+              style: const TextStyle(color: Colors.grey, fontSize: 13),
             ),
           );
         }
 
         final countryInfo = countriesData[selectedId];
-        final name = countryInfo?.name ?? selectedId;
+        final name = countryInfo?.getName(localeProvider.currentLocale) ?? selectedId;
         
         final currentData = provider.userData[selectedId];
         final isVisited = currentData?.status == CountryStatus.visited;
@@ -43,11 +45,11 @@ class DetailPanel extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Fraunces',
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textColor,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -59,9 +61,9 @@ class DetailPanel extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isVisited ? AppTheme.countryVisited : AppTheme.panelBg,
-                      foregroundColor: isVisited ? AppTheme.ink1 : AppTheme.textColor,
-                      side: BorderSide(color: isVisited ? AppTheme.countryVisited : AppTheme.mapStroke),
+                      backgroundColor: isVisited ? AppTheme.countryVisited : Theme.of(context).cardColor,
+                      foregroundColor: isVisited ? Theme.of(context).colorScheme.surfaceTint : Theme.of(context).colorScheme.onSurface,
+                      side: BorderSide(color: isVisited ? AppTheme.countryVisited : Theme.of(context).colorScheme.outline),
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
@@ -69,13 +71,13 @@ class DetailPanel extends StatelessWidget {
                     onPressed: () {
                       provider.markCountryStatus(selectedId, isVisited ? CountryStatus.none : CountryStatus.visited);
                     },
-                    child: Text(isVisited ? 'Visité ✓' : 'Marquer visité'),
+                    child: Text(isVisited ? '${tr(context, 'visited')} ✓' : tr(context, 'mark_visited')),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isLived ? AppTheme.countryLived : AppTheme.panelBg,
-                      foregroundColor: isLived ? AppTheme.ink1 : AppTheme.textColor,
-                      side: BorderSide(color: isLived ? AppTheme.countryLived : AppTheme.mapStroke),
+                      backgroundColor: isLived ? AppTheme.countryLived : Theme.of(context).cardColor,
+                      foregroundColor: isLived ? Theme.of(context).colorScheme.surfaceTint : Theme.of(context).colorScheme.onSurface,
+                      side: BorderSide(color: isLived ? AppTheme.countryLived : Theme.of(context).colorScheme.outline),
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
@@ -83,13 +85,13 @@ class DetailPanel extends StatelessWidget {
                     onPressed: () {
                       provider.markCountryStatus(selectedId, isLived ? CountryStatus.none : CountryStatus.lived);
                     },
-                    child: Text(isLived ? 'Habité ✓' : 'Marquer habité'),
+                    child: Text(isLived ? '${tr(context, 'lived')} ✓' : tr(context, 'mark_lived')),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isWish ? AppTheme.countryWishlist : AppTheme.panelBg,
-                      foregroundColor: isWish ? AppTheme.ink1 : AppTheme.textColor,
-                      side: BorderSide(color: isWish ? AppTheme.countryWishlist : AppTheme.mapStroke),
+                      backgroundColor: isWish ? AppTheme.countryWishlist : Theme.of(context).cardColor,
+                      foregroundColor: isWish ? Theme.of(context).colorScheme.surfaceTint : Theme.of(context).colorScheme.onSurface,
+                      side: BorderSide(color: isWish ? AppTheme.countryWishlist : Theme.of(context).colorScheme.outline),
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
@@ -97,13 +99,13 @@ class DetailPanel extends StatelessWidget {
                     onPressed: () {
                       provider.markCountryStatus(selectedId, isWish ? CountryStatus.none : CountryStatus.wishlist);
                     },
-                    child: Text(isWish ? 'Envie ✓' : 'Envie d\'y aller'),
+                    child: Text(isWish ? '${tr(context, 'wishlist')} ✓' : tr(context, 'add_wishlist')),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isRedlist ? AppTheme.countryRedlistHover : AppTheme.panelBg,
-                      foregroundColor: isRedlist ? Colors.white : AppTheme.textColor,
-                      side: BorderSide(color: isRedlist ? AppTheme.countryRedlistHover : AppTheme.mapStroke),
+                      backgroundColor: isRedlist ? AppTheme.countryRedlistHover : Theme.of(context).cardColor,
+                      foregroundColor: isRedlist ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                      side: BorderSide(color: isRedlist ? AppTheme.countryRedlistHover : Theme.of(context).colorScheme.outline),
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
@@ -111,7 +113,7 @@ class DetailPanel extends StatelessWidget {
                     onPressed: () {
                       provider.markCountryStatus(selectedId, isRedlist ? CountryStatus.none : CountryStatus.redlist);
                     },
-                    child: Text(isRedlist ? 'Liste rouge ✓' : 'Liste rouge'),
+                    child: Text(isRedlist ? '${tr(context, 'redlist')} ✓' : tr(context, 'add_redlist')),
                   ),
                 ],
               ),
@@ -124,16 +126,16 @@ class DetailPanel extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: AppTheme.countryRedlistHover.withValues(alpha: 0.2)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: AppTheme.countryRedlistHover, size: 20),
-                      SizedBox(width: 8),
+                      const Icon(Icons.info_outline, color: AppTheme.countryRedlistHover, size: 20),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Ce pays est exclu de vos statistiques globales de surface et de complétion du monde.',
+                          tr(context, 'redlist_info'),
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppTheme.textColor,
+                            color: Theme.of(context).colorScheme.onSurface,
                             height: 1.3,
                           ),
                         ),
@@ -149,10 +151,18 @@ class DetailPanel extends StatelessWidget {
                   cities: currentData.cities,
                   provider: provider,
                 ),
+                const SizedBox(height: 24),
+                _NotesSection(
+                  countryId: selectedId,
+                  notes: currentData.notes,
+                  provider: provider,
+                ),
+                const SizedBox(height: 24),
+                _PhotosSection(),
               ],
               if (currentData != null && currentData.status != CountryStatus.none) ...[
                 const SizedBox(height: 16),
-                const Divider(color: AppTheme.mapStroke),
+                Divider(color: Theme.of(context).colorScheme.outline),
                 TextButton(
                   onPressed: () {
                     provider.removeCountryData(selectedId);
@@ -161,7 +171,7 @@ class DetailPanel extends StatelessWidget {
                     foregroundColor: Colors.redAccent,
                     minimumSize: const Size(double.infinity, 44),
                   ),
-                  child: const Text('Supprimer ce pays'),
+                  child: Text(tr(context, 'remove_country')),
                 ),
               ],
             ],
@@ -215,10 +225,10 @@ class _CitiesSectionState extends State<_CitiesSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Villes visitées',
+        Text(
+          tr(context, 'cities_visited'),
           style: TextStyle(
-            color: AppTheme.textColor,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w600,
             fontSize: 16,
           ),
@@ -231,7 +241,7 @@ class _CitiesSectionState extends State<_CitiesSection> {
             return Chip(
               label: Text(city),
               onDeleted: () => _removeCity(city),
-              backgroundColor: AppTheme.mapStroke,
+              backgroundColor: Theme.of(context).colorScheme.outline,
               deleteIconColor: Colors.grey,
               side: BorderSide.none,
               labelStyle: const TextStyle(fontSize: 13),
@@ -240,25 +250,249 @@ class _CitiesSectionState extends State<_CitiesSection> {
           }).toList(),
         ),
         if (widget.cities.isNotEmpty) const SizedBox(height: 12),
-        TextField(
-          controller: _controller,
-          style: const TextStyle(fontSize: 14),
-          decoration: InputDecoration(
-            hintText: 'Ajouter une ville (Entrée pour valider)',
-            hintStyle: const TextStyle(color: Colors.grey),
-            filled: true,
-            fillColor: AppTheme.mapBg,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide.none,
+        Autocomplete<String>(
+          optionsBuilder: (TextEditingValue textEditingValue) {
+            if (textEditingValue.text.isEmpty) {
+              return const Iterable<String>.empty();
+            }
+            final query = textEditingValue.text.toLowerCase();
+            final countryCities = citiesData[widget.countryId] ?? [];
+            return countryCities
+                .map((c) => c.name)
+                .where((name) => name.toLowerCase().contains(query))
+                .take(10);
+          },
+          onSelected: (String selection) {
+            _addCity(selection);
+          },
+          fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
+            return TextField(
+              controller: controller,
+              focusNode: focusNode,
+              style: const TextStyle(fontSize: 14),
+              decoration: InputDecoration(
+                hintText: tr(context, 'add_city'),
+                hintStyle: const TextStyle(color: Colors.grey),
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.add_circle, color: AppTheme.countryVisited),
+                  onPressed: () {
+                     _addCity(controller.text);
+                     controller.clear();
+                  },
+                ),
+              ),
+              onSubmitted: (val) {
+                _addCity(val);
+                controller.clear();
+              },
+            );
+          },
+          optionsViewBuilder: (context, onSelected, options) {
+            return Align(
+              alignment: Alignment.topLeft,
+              child: Material(
+                color: Theme.of(context).cardColor,
+                elevation: 4.0,
+                borderRadius: BorderRadius.circular(8),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 200, maxWidth: 300),
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    itemCount: options.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final String option = options.elementAt(index);
+                      return InkWell(
+                        onTap: () {
+                          onSelected(option);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Text(option, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _NotesSection extends StatefulWidget {
+  final String countryId;
+  final String? notes;
+  final MapProvider provider;
+
+  const _NotesSection({
+    Key? key,
+    required this.countryId,
+    required this.notes,
+    required this.provider,
+  }) : super(key: key);
+
+  @override
+  State<_NotesSection> createState() => _NotesSectionState();
+}
+
+class _NotesSectionState extends State<_NotesSection> {
+  late TextEditingController _controller;
+  bool _isEditing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.notes ?? '');
+  }
+  
+  @override
+  void didUpdateWidget(_NotesSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.countryId != widget.countryId) {
+      _controller.text = widget.notes ?? '';
+      _isEditing = false;
+    }
+  }
+
+  void _save() {
+    final text = _controller.text.trim();
+    widget.provider.updateNotes(widget.countryId, text);
+    setState(() {
+      _isEditing = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasNotes = widget.notes != null && widget.notes!.isNotEmpty;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              tr(context, 'journal'),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.add_circle, color: AppTheme.countryVisited),
-              onPressed: () => _addCity(_controller.text),
+            if (hasNotes && !_isEditing)
+              IconButton(
+                icon: const Icon(Icons.edit, size: 20, color: Colors.grey),
+                onPressed: () => setState(() => _isEditing = true),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (_isEditing || !hasNotes) ...[
+          TextField(
+            controller: _controller,
+            maxLines: 4,
+            style: const TextStyle(fontSize: 14),
+            decoration: InputDecoration(
+              hintText: 'Vos souvenirs, anecdotes, ou impressions...',
+              hintStyle: const TextStyle(color: Colors.grey),
+              filled: true,
+              fillColor: Theme.of(context).colorScheme.surface,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide.none,
+              ),
             ),
           ),
-          onSubmitted: _addCity,
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.countryVisited,
+                foregroundColor: Theme.of(context).colorScheme.surfaceTint,
+              ),
+              onPressed: _save,
+              child: const Text('Enregistrer'),
+            ),
+          ),
+        ] else ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              widget.notes!,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14, height: 1.5),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _PhotosSection extends StatelessWidget {
+  const _PhotosSection({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          tr(context, 'photos'),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Theme.of(context).colorScheme.outline, style: BorderStyle.solid),
+          ),
+          child: Column(
+            children: [
+              const Icon(Icons.photo_library, color: Colors.grey, size: 40),
+              const SizedBox(height: 16),
+              Text(
+                'Galerie photo en construction',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Bientôt, vous pourrez uploader et revivre vos meilleurs souvenirs en images !',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+            ],
+          ),
         ),
       ],
     );

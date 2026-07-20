@@ -5,6 +5,7 @@ import 'panels/detail_panel.dart';
 import 'panels/journal_panel.dart';
 import 'panels/panel_widget.dart';
 import '../providers/map_provider.dart';
+import '../providers/locale_provider.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../models/map_models.dart';
@@ -24,37 +25,37 @@ class SidebarWidget extends StatelessWidget {
           const SearchPanel(),
           const DetailPanel(),
           const JournalPanel(),
-          _buildWishlistPanel(),
-          _buildRedlistPanel(),
+          _buildWishlistPanel(context),
+          _buildRedlistPanel(context),
         ],
       ),
     );
   }
 
-  Widget _buildWishlistPanel() {
-    return Consumer<MapProvider>(
-      builder: (context, provider, child) {
+  Widget _buildWishlistPanel(BuildContext context) {
+    return Consumer2<MapProvider, LocaleProvider>(
+      builder: (context, provider, localeProvider, child) {
         final wishlistIds = provider.userData.entries
             .where((e) => e.value.status == CountryStatus.wishlist)
             .map((e) => e.key)
             .toList();
 
         return PanelWidget(
-          title: 'Liste d\'envies',
+          title: tr(context, 'wishlist'),
           trailing: Text(
             '${wishlistIds.length}',
             style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
           ),
           child: wishlistIds.isEmpty
-              ? const Text(
-                  'Aucun pays en liste d\'envies.',
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
+              ? Text(
+                  tr(context, 'wishlist_panel_empty'),
+                  style: const TextStyle(color: Colors.grey, fontSize: 13),
                 )
               : Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: wishlistIds.map((id) {
-                    final name = countriesData[id]?.name ?? id;
+                    final name = countriesData[id]?.getName(localeProvider.currentLocale) ?? id;
                     return ActionChip(
                       label: Text(name),
                       backgroundColor: AppTheme.countryWishlist.withValues(alpha: 0.1),
@@ -70,9 +71,9 @@ class SidebarWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildRedlistPanel() {
-    return Consumer<MapProvider>(
-      builder: (context, provider, child) {
+  Widget _buildRedlistPanel(BuildContext context) {
+    return Consumer2<MapProvider, LocaleProvider>(
+      builder: (context, provider, localeProvider, child) {
         final redlistIds = provider.userData.entries
             .where((e) => e.value.status == CountryStatus.redlist)
             .map((e) => e.key)
@@ -81,7 +82,7 @@ class SidebarWidget extends StatelessWidget {
         if (redlistIds.isEmpty) return const SizedBox.shrink(); // Hide panel if empty to save space
 
         return PanelWidget(
-          title: 'Liste rouge',
+          title: tr(context, 'redlist'),
           trailing: Text(
             '${redlistIds.length}',
             style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
@@ -90,9 +91,9 @@ class SidebarWidget extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: redlistIds.map((id) {
-              final name = countriesData[id]?.name ?? id;
+              final name = countriesData[id]?.getName(localeProvider.currentLocale) ?? id;
               return ActionChip(
-                label: Text(name, style: const TextStyle(color: AppTheme.textColor)),
+                label: Text(name, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                 backgroundColor: AppTheme.countryRedlistHover.withValues(alpha: 0.1),
                 side: BorderSide(color: AppTheme.countryRedlistHover.withValues(alpha: 0.5)),
                 onPressed: () {

@@ -15,11 +15,17 @@ class WorldMapPainter extends CustomPainter {
   final List<ParsedMapGroup> parsedGroups;
   final Map<String, UserCountryData> userData;
   final String? hoveredCountryId;
+  final Color mapStrokeColor;
+  final Color countryFillColor;
+  final Color countryHoverColor;
 
   WorldMapPainter({
     required this.parsedGroups,
     required this.userData,
     this.hoveredCountryId,
+    required this.mapStrokeColor,
+    required this.countryFillColor,
+    required this.countryHoverColor,
   });
 
   @override
@@ -27,7 +33,7 @@ class WorldMapPainter extends CustomPainter {
     // Background ocean is drawn by the parent widget's Container
 
     final strokePaint = Paint()
-      ..color = AppTheme.mapStroke
+      ..color = mapStrokeColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.5
       ..strokeJoin = StrokeJoin.round;
@@ -75,7 +81,7 @@ class WorldMapPainter extends CustomPainter {
       case CountryStatus.redlist:
         return isHovered ? AppTheme.countryRedlistHover : AppTheme.countryRedlist;
       case CountryStatus.none:
-        return isHovered ? AppTheme.countryHover : AppTheme.countryFill;
+        return isHovered ? countryHoverColor : countryFillColor;
     }
   }
 

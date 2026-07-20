@@ -19,14 +19,14 @@ class AuthScreen extends StatelessWidget {
             children: [
               const Icon(Icons.public, size: 80, color: AppTheme.countryVisited),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Atlas',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Fraunces',
                   fontSize: 48,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textColor,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),

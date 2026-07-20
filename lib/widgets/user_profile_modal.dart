@@ -4,6 +4,8 @@ import '../providers/map_provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/map_models.dart';
 import '../theme/app_theme.dart';
+import '../providers/locale_provider.dart';
+import '../providers/theme_provider.dart';
 
 class UserProfileModal extends StatelessWidget {
   const UserProfileModal({Key? key}) : super(key: key);
@@ -25,8 +27,8 @@ class UserProfileModal extends StatelessWidget {
       maxChildSize: 0.95,
       builder: (_, controller) {
         return Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.panelBg,
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           padding: const EdgeInsets.all(24.0),
@@ -47,64 +49,142 @@ class UserProfileModal extends StatelessWidget {
               return ListView(
                 controller: controller,
                 children: [
-                  const Text(
-                    'Mon Profil de Voyageur',
+                  Text(
+                    tr(context, 'profile_title'),
                     style: TextStyle(
                       fontFamily: 'Fraunces',
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.textColor,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    authProvider.uid == null ? 'Utilisateur invité (Données locales)' : 'Compte synchronisé',
+                    authProvider.uid == null ? tr(context, 'profile_guest') : tr(context, 'profile_sync'),
                     style: const TextStyle(color: Colors.grey, fontSize: 14),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
-                  const Text(
-                    'Mes Statistiques Détaillées',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.textColor,
+                  
+                  // Language Selector
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.language, color: Colors.grey),
+                            const SizedBox(width: 8),
+                            Text(
+                              tr(context, 'language'),
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
+                            ),
+                          ],
+                        ),
+                        Consumer<LocaleProvider>(
+                          builder: (context, localeProvider, child) {
+                            return DropdownButton<String>(
+                              value: localeProvider.currentLocale,
+                              underline: const SizedBox(),
+                              dropdownColor: Theme.of(context).cardColor,
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                              items: [
+                                DropdownMenuItem(value: 'fr', child: Text(tr(context, 'language_fr'))),
+                                DropdownMenuItem(value: 'en', child: Text(tr(context, 'language_en'))),
+                                DropdownMenuItem(value: 'es', child: Text(tr(context, 'language_es'))),
+                              ],
+                              onChanged: (val) {
+                                if (val != null) localeProvider.setLocale(val);
+                              },
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildStatRow('Pays visités', '$visited', AppTheme.countryVisited),
-                  _buildStatRow('Pays habités', '$lived', AppTheme.countryLived),
-                  _buildStatRow('Liste d\'envies', '$wishlist', AppTheme.countryWishlist),
-                  _buildStatRow('Liste rouge (exclus)', '$redlist', AppTheme.countryRedlistHover),
+                  
+                  // Theme Selector
+                  Consumer<ThemeProvider>(
+                    builder: (context, themeProvider, child) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(themeProvider.isDark ? Icons.dark_mode : Icons.light_mode, color: Colors.grey),
+                                const SizedBox(width: 8),
+                                Text(
+                                  tr(context, 'dark_mode'),
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
+                                ),
+                              ],
+                            ),
+                            Switch(
+                              value: themeProvider.isDark,
+                              activeThumbColor: AppTheme.countryVisited,
+                              onChanged: (_) => themeProvider.toggleTheme(),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 32),
+
+                  Text(
+                    tr(context, 'profile_stats_title'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildStatRow(context, tr(context, 'stat_visited'), '$visited', AppTheme.countryVisited),
+                  _buildStatRow(context, tr(context, 'stat_lived'), '$lived', AppTheme.countryLived),
+                  _buildStatRow(context, tr(context, 'stat_wishlist'), '$wishlist', AppTheme.countryWishlist),
+                  _buildStatRow(context, tr(context, 'stat_redlist'), '$redlist', AppTheme.countryRedlistHover),
                   const SizedBox(height: 32),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppTheme.mapBg,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Row(
                           children: [
-                            Icon(Icons.palette, color: Colors.grey),
-                            SizedBox(width: 8),
+                            const Icon(Icons.palette, color: Colors.grey),
+                            const SizedBox(width: 8),
                             Text(
-                              'Personnalisation des couleurs',
+                              tr(context, 'color_custom_title'),
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: AppTheme.textColor,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
-                          'Bientôt disponible : Vous pourrez bientôt choisir vos propres couleurs pour la carte !',
-                          style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.4),
+                          tr(context, 'color_custom_desc'),
+                          style: const TextStyle(color: Colors.grey, fontSize: 13, height: 1.4),
                         ),
                       ],
                     ),
@@ -113,9 +193,9 @@ class UserProfileModal extends StatelessWidget {
                   if (authProvider.uid != null)
                     ElevatedButton.icon(
                       icon: const Icon(Icons.logout),
-                      label: const Text('Se déconnecter'),
+                      label: Text(tr(context, 'logout')),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.mapStroke,
+                        backgroundColor: Theme.of(context).colorScheme.outline,
                         foregroundColor: Colors.redAccent,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
@@ -127,10 +207,10 @@ class UserProfileModal extends StatelessWidget {
                   else
                     ElevatedButton.icon(
                       icon: const Icon(Icons.login),
-                      label: const Text('Se connecter pour synchroniser'),
+                      label: Text(tr(context, 'login_sync')),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.countryVisited,
-                        foregroundColor: AppTheme.ink1,
+                        foregroundColor: Theme.of(context).colorScheme.surfaceTint,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       onPressed: () {
@@ -146,7 +226,7 @@ class UserProfileModal extends StatelessWidget {
     );
   }
 
-  Widget _buildStatRow(String label, String value, Color color) {
+  Widget _buildStatRow(BuildContext context, String label, String value, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -162,14 +242,14 @@ class UserProfileModal extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 label,
-                style: const TextStyle(color: AppTheme.textColor, fontSize: 16),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
               ),
             ],
           ),
           Text(
             value,
-            style: const TextStyle(
-              color: AppTheme.textColor,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),

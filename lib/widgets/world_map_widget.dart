@@ -5,7 +5,8 @@ import '../models/map_models.dart';
 import '../data/countries.dart';
 import '../theme/app_theme.dart';
 import 'world_map_painter.dart';
-
+import 'package:provider/provider.dart';
+import '../providers/locale_provider.dart';
 class WorldMapWidget extends StatefulWidget {
   final Map<String, UserCountryData> userData;
   final Function(String countryId) onCountryTap;
@@ -147,6 +148,9 @@ class _WorldMapWidgetState extends State<WorldMapWidget> {
                       parsedGroups: _parsedGroups!,
                       userData: widget.userData,
                       hoveredCountryId: _hoveredCountryId,
+                      mapStrokeColor: Theme.of(context).colorScheme.outline,
+                      countryFillColor: Theme.of(context).colorScheme.surfaceContainer,
+                      countryHoverColor: Theme.of(context).colorScheme.surfaceContainerHigh,
                     ),
                   ),
                 ),
@@ -163,9 +167,9 @@ class _WorldMapWidgetState extends State<WorldMapWidget> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppTheme.panelBg.withValues(alpha: 0.9),
+                  color: Theme.of(context).cardColor.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppTheme.mapStroke),
+                  border: Border.all(color: Theme.of(context).colorScheme.outline),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.2),
@@ -174,14 +178,18 @@ class _WorldMapWidgetState extends State<WorldMapWidget> {
                     ),
                   ],
                 ),
-                child: Text(
-                  countriesData[_hoveredCountryId!]?.name ?? _hoveredCountryId!,
-                  style: const TextStyle(
-                    fontFamily: 'Fraunces',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textColor,
-                  ),
+                child: Consumer<LocaleProvider>(
+                  builder: (context, localeProvider, child) {
+                    return Text(
+                      countriesData[_hoveredCountryId!]?.getName(localeProvider.currentLocale) ?? _hoveredCountryId!,
+                      style: TextStyle(
+                        fontFamily: 'Fraunces',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

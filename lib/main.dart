@@ -5,7 +5,9 @@ import 'data_providers/hive_repository.dart';
 import 'providers/auth_provider.dart';
 import 'providers/map_provider.dart';
 import 'providers/geo_provider.dart';
-import 'screens/auth_wrapper.dart';
+import 'providers/locale_provider.dart';
+import 'providers/theme_provider.dart';
+import 'screens/map_screen.dart';
 import 'theme/app_theme.dart';
 import 'firebase_options.dart';
 
@@ -15,10 +17,18 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await HiveRepository.init();
+
+  final localeProvider = LocaleProvider();
+  await localeProvider.init();
+  
+  final themeProvider = ThemeProvider();
+  await themeProvider.init();
   
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: localeProvider),
+        ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProxyProvider<AuthProvider, MapProvider>(
           create: (context) => MapProvider(context.read<AuthProvider>()),
@@ -39,11 +49,17 @@ class AtlasApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Atlas',
-      theme: AppTheme.theme,
-      home: const AuthWrapper(),
-      debugShowCheckedModeBanner: false,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Atlas',
+          themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          home: const MapScreen(),
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }

@@ -4,6 +4,7 @@ import 'panel_widget.dart';
 import '../../theme/app_theme.dart';
 import '../../data/countries.dart';
 import '../../providers/map_provider.dart';
+import '../../providers/locale_provider.dart';
 
 class SearchPanel extends StatefulWidget {
   const SearchPanel({Key? key}) : super(key: key);
@@ -18,67 +19,69 @@ class _SearchPanelState extends State<SearchPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return PanelWidget(
-      title: 'Rechercher un pays',
-      child: Autocomplete<String>(
-        optionsBuilder: (TextEditingValue textEditingValue) {
-          if (textEditingValue.text.isEmpty) {
-            return const Iterable<String>.empty();
-          }
-          final query = textEditingValue.text.toLowerCase();
-          return countriesData.entries
-              .where((entry) => entry.value.name.toLowerCase().contains(query))
-              .map((entry) => entry.key);
-        },
-        displayStringForOption: (String id) => countriesData[id]?.name ?? id,
-        onSelected: (String id) {
-          context.read<MapProvider>().selectCountry(id);
-          _controller.clear();
-          _focusNode.unfocus();
-        },
-        fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-          // Sync controllers for clearing
-          if (_controller.text != controller.text) {
-            controller.text = _controller.text;
-          }
-          controller.addListener(() {
-            _controller.text = controller.text;
-          });
+    return Consumer<LocaleProvider>(
+      builder: (context, localeProvider, child) {
+        return PanelWidget(
+          title: tr(context, 'search_country'),
+          child: Autocomplete<String>(
+            optionsBuilder: (TextEditingValue textEditingValue) {
+              if (textEditingValue.text.isEmpty) {
+                return const Iterable<String>.empty();
+              }
+              final query = textEditingValue.text.toLowerCase();
+              return countriesData.entries
+                  .where((entry) => (entry.value.getName(localeProvider.currentLocale)).toLowerCase().contains(query))
+                  .map((entry) => entry.key);
+            },
+            displayStringForOption: (String id) => countriesData[id]?.getName(localeProvider.currentLocale) ?? id,
+            onSelected: (String id) {
+              context.read<MapProvider>().selectCountry(id);
+              _controller.clear();
+              _focusNode.unfocus();
+            },
+            fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+              // Sync controllers for clearing
+              if (_controller.text != controller.text) {
+                controller.text = _controller.text;
+              }
+              controller.addListener(() {
+                _controller.text = controller.text;
+              });
 
-          return TextField(
-            controller: controller,
-            focusNode: focusNode,
-            decoration: InputDecoration(
-              hintText: 'Cliquez ou tapez pour chercher...',
-              hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-              filled: true,
-              fillColor: AppTheme.ink1,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppTheme.mapStroke),
-              ),
+              return TextField(
+                controller: controller,
+                focusNode: focusNode,
+                decoration: InputDecoration(
+                  hintText: tr(context, 'search_hint'),
+                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceTint,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                  ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppTheme.mapStroke),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: AppTheme.countryVisited),
               ),
             ),
-            style: const TextStyle(color: AppTheme.textColor, fontSize: 14),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           );
         },
         optionsViewBuilder: (context, onSelected, options) {
           return Align(
             alignment: Alignment.topLeft,
             child: Material(
-              color: AppTheme.panelBg,
+              color: Theme.of(context).cardColor,
               elevation: 4,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-                side: const BorderSide(color: AppTheme.mapStroke),
+                side: BorderSide(color: Theme.of(context).colorScheme.outline),
               ),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 200, maxWidth: 300),
@@ -88,9 +91,9 @@ class _SearchPanelState extends State<SearchPanel> {
                   itemCount: options.length,
                   itemBuilder: (context, index) {
                     final id = options.elementAt(index);
-                    final name = countriesData[id]?.name ?? id;
+                    final name = countriesData[id]?.getName(Provider.of<LocaleProvider>(context, listen: false).currentLocale) ?? id;
                     return ListTile(
-                      title: Text(name, style: const TextStyle(color: AppTheme.textColor)),
+                      title: Text(name, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       onTap: () => onSelected(id),
                     );
                   },
@@ -100,6 +103,8 @@ class _SearchPanelState extends State<SearchPanel> {
           );
         },
       ),
+    );
+      },
     );
   }
 }

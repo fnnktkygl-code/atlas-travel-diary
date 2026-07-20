@@ -132,4 +132,18 @@ class MapProvider extends ChangeNotifier {
       _firestoreService.saveUserCountry(authProvider.uid!, newData);
     }
   }
+
+  void updateNotes(String countryId, String notes) {
+    final existing = _userData[countryId];
+    if (existing == null) return;
+    
+    final newData = existing.copyWith(notes: notes);
+    _userData[countryId] = newData;
+    HiveRepository.saveUserData(newData);
+    notifyListeners();
+
+    if (authProvider.uid != null) {
+      _firestoreService.saveUserCountry(authProvider.uid!, newData);
+    }
+  }
 }
