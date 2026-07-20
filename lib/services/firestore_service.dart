@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import '../models/map_models.dart';
 
 class FirestoreService {
@@ -43,5 +45,25 @@ class FirestoreService {
         .collection('countries')
         .doc(countryId)
         .delete();
+  }
+
+  // Upload photo to Firebase Storage
+  Future<String> uploadPhoto(String uid, String countryId, Uint8List fileBytes, String fileName) async {
+    final storageRef = FirebaseStorage.instance.ref();
+    final photoRef = storageRef.child('users/$uid/$countryId/$fileName');
+    
+    final uploadTask = photoRef.putData(fileBytes);
+    final snapshot = await uploadTask;
+    return await snapshot.ref.getDownloadURL();
+  }
+
+  // Delete photo from Firebase Storage
+  Future<void> deletePhoto(String photoUrl) async {
+    try {
+      final photoRef = FirebaseStorage.instance.refFromURL(photoUrl);
+      await photoRef.delete();
+    } catch (e) {
+      print('Error deleting photo: $e');
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../models/map_models.dart';
 import '../data_providers/hive_repository.dart';
@@ -145,5 +146,41 @@ class MapProvider extends ChangeNotifier {
     if (authProvider.uid != null) {
       _firestoreService.saveUserCountry(authProvider.uid!, newData);
     }
+  }
+
+  void addPhoto(String countryId, String photoUrl) {
+    final existing = _userData[countryId];
+    if (existing == null) return;
+
+    final updatedPhotos = List<String>.from(existing.photos)..add(photoUrl);
+    final newData = existing.copyWith(photos: updatedPhotos);
+    _userData[countryId] = newData;
+    HiveRepository.saveUserData(newData);
+    notifyListeners();
+
+    if (authProvider.uid != null) {
+      _firestoreService.saveUserCountry(authProvider.uid!, newData);
+    }
+  }
+
+  void removePhoto(String countryId, String photoUrl) {
+    final existing = _userData[countryId];
+    if (existing == null) return;
+
+    final updatedPhotos = List<String>.from(existing.photos)..remove(photoUrl);
+    final newData = existing.copyWith(photos: updatedPhotos);
+    _userData[countryId] = newData;
+    HiveRepository.saveUserData(newData);
+    notifyListeners();
+
+    if (authProvider.uid != null) {
+      _firestoreService.saveUserCountry(authProvider.uid!, newData);
+      _firestoreService.deletePhoto(photoUrl);
+    }
+  }
+
+  Future<String?> uploadPhoto(String countryId, Uint8List fileBytes, String fileName) async {
+    if (authProvider.uid == null) return null;
+    return await _firestoreService.uploadPhoto(authProvider.uid!, countryId, fileBytes, fileName);
   }
 }

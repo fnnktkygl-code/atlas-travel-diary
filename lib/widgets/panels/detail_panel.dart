@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 import 'package:provider/provider.dart';
 import '../../providers/map_provider.dart';
 import '../../providers/locale_provider.dart';
@@ -158,7 +160,11 @@ class DetailPanel extends StatelessWidget {
                   provider: provider,
                 ),
                 const SizedBox(height: 24),
-                _PhotosSection(),
+                _PhotosSection(
+                  countryId: selectedId,
+                  photos: currentData.photos,
+                  provider: provider,
+                ),
               ],
               if (currentData != null && currentData.status != CountryStatus.none) ...[
                 const SizedBox(height: 16),
@@ -452,48 +458,160 @@ class _NotesSectionState extends State<_NotesSection> {
   }
 }
 
-class _PhotosSection extends StatelessWidget {
-  const _PhotosSection({Key? key}) : super(key: key);
+class _PhotosSection extends StatefulWidget {
+  final String countryId;
+  final List<String>? photos;
+  final MapProvider provider;
+
+  const _PhotosSection({
+    Key? key,
+    required this.countryId,
+    required this.photos,
+    required this.provider,
+  }) : super(key: key);
+
+  @override
+  State<_PhotosSection> createState() => _PhotosSectionState();
+}
+
+class _PhotosSectionState extends State<_PhotosSection> {
+  final ImagePicker _picker = ImagePicker();
+  final Uuid _uuid = const Uuid();
+  bool _isUploading = false;
+
+  Future<void> _pickAndUploadImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      setState(() => _isUploading = true);
+
+      final bytes = await image.readAsBytes();
+      final extension = image.name.split('.').last;
+      final fileName = '${_uuid.v4()}.$extension';
+
+      final url = await widget.provider.uploadPhoto(widget.countryId, bytes, fileName);
+      if (url != null) {
+        widget.provider.addPhoto(widget.countryId, url);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erreur lors de l'upload: $e")),
+      );
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final photos = widget.photos ?? [];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          tr(context, 'photos'),
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              tr(context, 'photos'),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+            IconButton(
+              icon: _isUploading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.add_a_photo, color: Colors.grey, size: 20),
+              onPressed: _isUploading ? null : _pickAndUploadImage,
+            ),
+          ],
         ),
         const SizedBox(height: 12),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Theme.of(context).colorScheme.outline, style: BorderStyle.solid),
+        if (photos.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Theme.of(context).colorScheme.outline, style: BorderStyle.solid),
+            ),
+            child: Column(
+              children: [
+                const Icon(Icons.photo_library, color: Colors.grey, size: 40),
+                const SizedBox(height: 16),
+                Text(
+                  'Aucune photo',
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Cliquez sur l'icône en haut pour uploader des images de ce pays.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                ),
+              ],
+            ),
+          )
+        else
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: photos.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
+            itemBuilder: (context, index) {
+              final photoUrl = photos[index];
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      photoUrl,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                                : null,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: GestureDetector(
+                      onTap: () => widget.provider.removePhoto(widget.countryId, photoUrl),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, size: 14, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-          child: Column(
-            children: [
-              const Icon(Icons.photo_library, color: Colors.grey, size: 40),
-              const SizedBox(height: 16),
-              Text(
-                'Galerie photo en construction',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Bientôt, vous pourrez uploader et revivre vos meilleurs souvenirs en images !',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 13),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
