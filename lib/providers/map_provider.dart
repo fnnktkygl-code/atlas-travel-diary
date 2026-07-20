@@ -177,7 +177,7 @@ class MapProvider extends ChangeNotifier {
     
     _userData.clear();
     _entries.clear();
-    await HiveRepository.clearCache();
+    await HiveRepository.clearAll();
     notifyListeners();
   }
 
