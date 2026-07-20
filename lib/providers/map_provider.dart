@@ -98,12 +98,14 @@ class MapProvider extends ChangeNotifier {
     if (uid != null) {
       // User is logged in
       _firestoreSubscription = _firestoreService.getUserCountriesStream(uid).listen((cloudData) {
-        if (cloudData.isEmpty && _userData.isNotEmpty) {
-          // Sync local to cloud
+        if (cloudData.isEmpty && _userData.isNotEmpty && !_isMigratedToCloud) {
+          // Sync local to cloud ONLY once (prevents re-uploading during reset)
+          _isMigratedToCloud = true;
           for (var entry in _userData.entries) {
             _firestoreService.saveUserCountry(uid, entry.value);
           }
         } else {
+          _isMigratedToCloud = true; // Mark as migrated since we are connected to cloud
           // Merge local guest data into cloud data
           for (final localEntry in _userData.entries) {
             if (!cloudData.containsKey(localEntry.key)) {
@@ -124,7 +126,7 @@ class MapProvider extends ChangeNotifier {
       });
 
       _entriesSubscription = _firestoreService.getUserEntriesStream(uid).listen((cloudEntries) {
-        if (cloudEntries.isEmpty && _entries.isNotEmpty) {
+        if (cloudEntries.isEmpty && _entries.isNotEmpty && !_isMigratedToCloud) {
           for (var e in _entries) {
             _firestoreService.saveUserEntry(uid, e);
           }
