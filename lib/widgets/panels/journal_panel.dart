@@ -5,6 +5,7 @@ import '../../providers/map_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../data/countries.dart';
 import '../../theme/app_theme.dart';
+import '../photo_viewer.dart';
 
 class JournalPanel extends StatelessWidget {
   const JournalPanel({Key? key}) : super(key: key);
@@ -92,6 +93,44 @@ class JournalPanel extends StatelessWidget {
                                   style: TextStyle(
                                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                                     fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            if (entry.photoUrls.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: SizedBox(
+                                  height: 60,
+                                  child: ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: entry.photoUrls.length,
+                                    separatorBuilder: (context, _) => const SizedBox(width: 8),
+                                    itemBuilder: (context, photoIndex) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) => PhotoViewerScreen(
+                                                photoUrls: entry.photoUrls,
+                                                initialIndex: photoIndex,
+                                              ),
+                                              fullscreenDialog: true,
+                                            ),
+                                          );
+                                        },
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(4),
+                                          child: Image.network(
+                                            entry.photoUrls[photoIndex],
+                                            height: 60,
+                                            width: 60,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               ),

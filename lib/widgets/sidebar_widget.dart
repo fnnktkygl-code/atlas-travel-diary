@@ -16,19 +16,23 @@ class SidebarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(right: 16, bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const GeoPanel(),
-          const SearchPanel(),
-          const DetailPanel(),
-          const JournalPanel(),
-          _buildWishlistPanel(context),
-          _buildRedlistPanel(context),
-        ],
-      ),
+    return Consumer<MapProvider>(
+      builder: (context, provider, child) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.only(right: 16, bottom: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const GeoPanel(),
+              const SearchPanel(),
+              const DetailPanel(),
+              if (provider.selectedCountryId == null) const JournalPanel(),
+              _buildWishlistPanel(context),
+              _buildRedlistPanel(context),
+            ],
+          ),
+        );
+      },
     );
   }
 

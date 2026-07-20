@@ -66,6 +66,9 @@ class _WorldMapWidgetState extends State<WorldMapWidget> {
         }
       }
     }
+    
+    // If we click outside any country path (ocean/empty space), deselect
+    widget.onCountryTap('');
   }
 
   Offset? _doubleTapPosition;

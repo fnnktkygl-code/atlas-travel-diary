@@ -209,6 +209,10 @@ class MapProvider extends ChangeNotifier {
   }
 
   void selectCountry(String countryId) {
+    if (countryId.isEmpty) {
+      clearSelection();
+      return;
+    }
     _selectedCountryId = countryId;
     notifyListeners();
   }

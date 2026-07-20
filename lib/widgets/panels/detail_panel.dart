@@ -8,6 +8,7 @@ import '../../providers/locale_provider.dart';
 import '../../data/countries.dart';
 import '../../data/cities.dart';
 import '../../theme/app_theme.dart';
+import '../photo_viewer.dart';
 import '../../screens/entry_editor_screen.dart';
 import 'panel_widget.dart';
 
@@ -258,13 +259,26 @@ class _EntriesSection extends StatelessWidget {
                             itemCount: entry.photoUrls.length,
                             separatorBuilder: (context, _) => const SizedBox(width: 8),
                             itemBuilder: (context, photoIndex) {
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: Image.network(
-                                  entry.photoUrls[photoIndex],
-                                  height: 60,
-                                  width: 60,
-                                  fit: BoxFit.cover,
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => PhotoViewerScreen(
+                                        photoUrls: entry.photoUrls,
+                                        initialIndex: photoIndex,
+                                      ),
+                                      fullscreenDialog: true,
+                                    ),
+                                  );
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: Image.network(
+                                    entry.photoUrls[photoIndex],
+                                    height: 60,
+                                    width: 60,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               );
                             },
