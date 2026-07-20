@@ -87,7 +87,7 @@ class StatStrip extends StatelessWidget {
                 fontFamily: 'Outfit',
                 fontSize: 26,
                 fontWeight: FontWeight.w600,
-                color: bump ? const Color(0xFFFBBF24) : Theme.of(context).colorScheme.onSurface,
+                color: bump ? AppTheme.countryVisited : Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 2),

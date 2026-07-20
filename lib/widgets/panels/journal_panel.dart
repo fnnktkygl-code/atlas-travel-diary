@@ -56,30 +56,26 @@ class JournalPanel extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        width: 8,
-                                        height: 8,
-                                        decoration: BoxDecoration(
-                                          color: data.status == CountryStatus.visited
-                                              ? AppTheme.countryVisited
-                                              : AppTheme.countryLived,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                    Text(
-                                      name,
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurface,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: data.status == CountryStatus.visited
+                                          ? AppTheme.countryVisited
+                                          : AppTheme.countryLived,
+                                      shape: BoxShape.circle,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    name,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                               if (data.cities.isNotEmpty) ...[
                                 const SizedBox(height: 4),

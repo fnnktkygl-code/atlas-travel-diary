@@ -5,6 +5,7 @@ import '../widgets/world_map_widget.dart';
 import '../widgets/stat_strip.dart';
 import '../widgets/sidebar_widget.dart';
 import '../widgets/user_profile_modal.dart';
+import '../widgets/legend_widget.dart';
 
 import '../models/map_models.dart';
 import '../data/countries.dart';
@@ -145,7 +146,15 @@ class MapScreen extends StatelessWidget {
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: mapWidget),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Expanded(child: mapWidget),
+                                const LegendWidget(),
+                                const SizedBox(height: 16),
+                              ],
+                            ),
+                          ),
                           const SizedBox(
                             width: 340,
                             child: SidebarWidget(),
@@ -158,6 +167,7 @@ class MapScreen extends StatelessWidget {
                             height: 400,
                             child: mapWidget,
                           ),
+                          const LegendWidget(),
                           const SizedBox(height: 16),
                           const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16),

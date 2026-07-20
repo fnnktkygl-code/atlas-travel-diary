@@ -49,7 +49,7 @@ const Map<String, Map<String, String>> translations = {
     'geo_desc': 'Centrer la carte sur ma position actuelle',
     'search_hint': "Tapez le nom d'un pays...",
     'save': 'Enregistrer',
-    'upload_error': 'Erreur lors de l\\'upload',
+    'upload_error': "Erreur lors de l'upload",
     'auth_subtitle': 'Votre carnet de voyage synchronisé',
     'auth_google': 'Se connecter avec Google',
     'error_login': 'Erreur de connexion',
