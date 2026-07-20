@@ -55,6 +55,10 @@ const Map<String, Map<String, String>> translations = {
     'error_login': 'Erreur de connexion',
     'country_selected': 'Pays sélectionné',
     'country_selected_empty': 'Cliquez sur un pays de la carte, ou utilisez la recherche, pour voir ses détails et ajouter un voyage.',
+    'add_memory': 'Ajouter un souvenir',
+    'edit_memory': 'Modifier le souvenir',
+    'title_optional': 'Titre (optionnel)',
+    'city_optional': 'Ville (optionnel)',
   },
   'en': {
     'app_title': 'Atlas - Travel Diary',
@@ -112,6 +116,10 @@ const Map<String, Map<String, String>> translations = {
     'error_login': 'Login error',
     'country_selected': 'Selected country',
     'country_selected_empty': 'Click on a country on the map, or use search, to view its details and add a trip.',
+    'add_memory': 'Add a memory',
+    'edit_memory': 'Edit memory',
+    'title_optional': 'Title (optional)',
+    'city_optional': 'City (optional)',
   },
   'es': {
     'app_title': 'Atlas - Diario de viaje',
@@ -169,5 +177,9 @@ const Map<String, Map<String, String>> translations = {
     'error_login': 'Error de inicio de sesión',
     'country_selected': 'País seleccionado',
     'country_selected_empty': 'Haz clic en un país del mapa o usa la búsqueda para ver sus detalles y agregar un viaje.',
+    'add_memory': 'Añadir un recuerdo',
+    'edit_memory': 'Editar recuerdo',
+    'title_optional': 'Título (opcional)',
+    'city_optional': 'Ciudad (opcional)',
   },
 };

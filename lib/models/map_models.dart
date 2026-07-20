@@ -66,3 +66,66 @@ class UserCountryData {
   }
 }
 
+class JournalEntry {
+  final String id;
+  final String countryCode;
+  final String? city;
+  final DateTime date;
+  final String? title;
+  final String note;
+  final List<String> photoUrls;
+
+  JournalEntry({
+    required this.id,
+    required this.countryCode,
+    this.city,
+    required this.date,
+    this.title,
+    this.note = '',
+    this.photoUrls = const [],
+  });
+
+  JournalEntry copyWith({
+    String? id,
+    String? countryCode,
+    String? city,
+    DateTime? date,
+    String? title,
+    String? note,
+    List<String>? photoUrls,
+  }) {
+    return JournalEntry(
+      id: id ?? this.id,
+      countryCode: countryCode ?? this.countryCode,
+      city: city ?? this.city,
+      date: date ?? this.date,
+      title: title ?? this.title,
+      note: note ?? this.note,
+      photoUrls: photoUrls ?? this.photoUrls,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'countryCode': countryCode,
+      'city': city,
+      'date': date.millisecondsSinceEpoch,
+      'title': title,
+      'note': note,
+      'photoUrls': photoUrls,
+    };
+  }
+
+  factory JournalEntry.fromJson(Map<String, dynamic> json) {
+    return JournalEntry(
+      id: json['id'] as String,
+      countryCode: json['countryCode'] as String,
+      city: json['city'] as String?,
+      date: DateTime.fromMillisecondsSinceEpoch(json['date'] as int),
+      title: json['title'] as String?,
+      note: json['note'] as String? ?? '',
+      photoUrls: (json['photoUrls'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+    );
+  }
+}

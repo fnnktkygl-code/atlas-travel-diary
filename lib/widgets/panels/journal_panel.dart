@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'panel_widget.dart';
 import '../../providers/map_provider.dart';
 import '../../providers/locale_provider.dart';
-import '../../models/map_models.dart';
 import '../../data/countries.dart';
 import '../../theme/app_theme.dart';
 
@@ -14,19 +13,7 @@ class JournalPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<MapProvider, LocaleProvider>(
       builder: (context, provider, localeProvider, child) {
-        final journalEntries = provider.userData.values
-            .where((data) =>
-                data.status == CountryStatus.visited ||
-                data.status == CountryStatus.lived)
-            .toList();
-
-        // Sort by date descending (most recent first)
-        journalEntries.sort((a, b) {
-          if (a.date == null && b.date == null) return 0;
-          if (a.date == null) return 1;
-          if (b.date == null) return -1;
-          return b.date!.compareTo(a.date!);
-        });
+        final journalEntries = provider.entries;
 
         return PanelWidget(
           title: tr(context, 'journal'),
@@ -44,56 +31,75 @@ class JournalPanel extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: journalEntries.length,
                   itemBuilder: (context, index) {
-                    final data = journalEntries[index];
-                    final name = countriesData[data.code]?.getName(localeProvider.currentLocale) ?? data.code;
+                    final entry = journalEntries[index];
+                    final countryName = countriesData[entry.countryCode]?.getName(localeProvider.currentLocale) ?? entry.countryCode;
                     
-                      return InkWell(
-                        onTap: () => provider.selectCountry(data.code),
-                        borderRadius: BorderRadius.circular(6),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: BoxDecoration(
-                                      color: data.status == CountryStatus.visited
-                                          ? AppTheme.countryVisited
-                                          : AppTheme.countryLived,
-                                      shape: BoxShape.circle,
-                                    ),
+                    return InkWell(
+                      onTap: () => provider.selectCountry(entry.countryCode),
+                      borderRadius: BorderRadius.circular(6),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: AppTheme.countryVisited,
+                                    shape: BoxShape.circle,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    name,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    entry.title?.isNotEmpty == true ? entry.title! : countryName,
                                     style: TextStyle(
                                       color: Theme.of(context).colorScheme.onSurface,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              if (data.cities.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Text(
-                                    data.cities.join(' • '),
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ),
+                                Text(
+                                  "${entry.date.day}/${entry.date.month}/${entry.date.year}",
+                                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                                ),
                               ],
+                            ),
+                            if (entry.title?.isNotEmpty == true || entry.city?.isNotEmpty == true) ...[
+                              const SizedBox(height: 4),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: Text(
+                                  [if (entry.title?.isNotEmpty == true) countryName, if (entry.city?.isNotEmpty == true) entry.city].join(' • '),
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
                             ],
-                          ),
+                            if (entry.note.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: Text(
+                                  entry.note,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
-                      );
+                      ),
+                    );
                   },
                 ),
         );

@@ -45,4 +45,41 @@ class FirestoreService {
         .delete();
   }
 
+  // --- Journal Entries ---
+
+  Stream<List<JournalEntry>> getUserEntriesStream(String uid) {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .collection('entries')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return JournalEntry.fromJson(data);
+      }).toList();
+    });
+  }
+
+  Future<void> saveUserEntry(String uid, JournalEntry entry) async {
+    final data = entry.toJson();
+    data.remove('id'); // doc id is managed by firestore
+    
+    await _db
+        .collection('users')
+        .doc(uid)
+        .collection('entries')
+        .doc(entry.id)
+        .set(data, SetOptions(merge: true));
+  }
+
+  Future<void> removeUserEntry(String uid, String entryId) async {
+    await _db
+        .collection('users')
+        .doc(uid)
+        .collection('entries')
+        .doc(entryId)
+        .delete();
+  }
 }

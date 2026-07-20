@@ -3,19 +3,22 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../models/map_models.dart';
 
 class HiveRepository {
-  static const String _boxName = 'user_countries';
+  static const String _countriesBox = 'user_countries';
+  static const String _entriesBox = 'user_entries';
   
   static Future<void> init() async {
     await Hive.initFlutter();
-    await Hive.openBox<String>(_boxName);
+    await Hive.openBox<String>(_countriesBox);
+    await Hive.openBox<String>(_entriesBox);
   }
 
-  static Box<String> get _box => Hive.box<String>(_boxName);
+  static Box<String> get _cBox => Hive.box<String>(_countriesBox);
+  static Box<String> get _eBox => Hive.box<String>(_entriesBox);
 
   static Map<String, UserCountryData> loadUserData() {
     final map = <String, UserCountryData>{};
-    for (var key in _box.keys) {
-      final jsonStr = _box.get(key);
+    for (var key in _cBox.keys) {
+      final jsonStr = _cBox.get(key);
       if (jsonStr != null) {
         try {
           final data = UserCountryData.fromJson(jsonDecode(jsonStr));
@@ -29,6 +32,29 @@ class HiveRepository {
   }
 
   static Future<void> saveUserData(UserCountryData data) async {
-    await _box.put(data.code, jsonEncode(data.toJson()));
+    await _cBox.put(data.code, jsonEncode(data.toJson()));
+  }
+
+  static List<JournalEntry> loadEntries() {
+    final list = <JournalEntry>[];
+    for (var key in _eBox.keys) {
+      final jsonStr = _eBox.get(key);
+      if (jsonStr != null) {
+        try {
+          list.add(JournalEntry.fromJson(jsonDecode(jsonStr)));
+        } catch (e) {
+          // Ignore invalid data
+        }
+      }
+    }
+    return list;
+  }
+
+  static Future<void> saveEntry(JournalEntry entry) async {
+    await _eBox.put(entry.id, jsonEncode(entry.toJson()));
+  }
+
+  static Future<void> removeEntry(String entryId) async {
+    await _eBox.delete(entryId);
   }
 }
