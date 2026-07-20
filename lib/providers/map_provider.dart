@@ -43,6 +43,7 @@ class MapProvider extends ChangeNotifier {
 
   void _migrateLegacyEntries() {
     bool localChanged = false;
+    final uid = authProvider.uid;
     for (var code in _userData.keys.toList()) {
       final data = _userData[code]!;
       // check if it has cities, notes, or photos, or date
@@ -60,6 +61,7 @@ class MapProvider extends ChangeNotifier {
             );
             _entries.add(entry);
             HiveRepository.saveEntry(entry);
+            if (uid != null) _firestoreService.saveUserEntry(uid, entry);
           }
         } else {
           final entry = JournalEntry(
@@ -71,12 +73,14 @@ class MapProvider extends ChangeNotifier {
           );
           _entries.add(entry);
           HiveRepository.saveEntry(entry);
+          if (uid != null) _firestoreService.saveUserEntry(uid, entry);
         }
 
         // Clean legacy fields
         final cleanedData = UserCountryData(code: data.code, status: data.status);
         _userData[code] = cleanedData;
         HiveRepository.saveUserData(cleanedData);
+        if (uid != null) _firestoreService.saveUserCountry(uid, cleanedData);
         localChanged = true;
       }
     }
@@ -94,11 +98,19 @@ class MapProvider extends ChangeNotifier {
     if (uid != null) {
       // User is logged in
       _firestoreSubscription = _firestoreService.getUserCountriesStream(uid).listen((cloudData) {
-        // If cloud data is empty but local data exists, migrate it
-        if (cloudData.isEmpty && _userData.isNotEmpty && !_isMigratedToCloud) {
-          _migrateLocalToCloud(uid);
-          _isMigratedToCloud = true;
+        if (cloudData.isEmpty && _userData.isNotEmpty) {
+          // Sync local to cloud
+          for (var entry in _userData.entries) {
+            _firestoreService.saveUserCountry(uid, entry.value);
+          }
         } else {
+          // Merge local guest data into cloud data
+          for (final localEntry in _userData.entries) {
+            if (!cloudData.containsKey(localEntry.key)) {
+              _firestoreService.saveUserCountry(uid, localEntry.value);
+              cloudData[localEntry.key] = localEntry.value;
+            }
+          }
           // Sync cloud to local map
           _userData = cloudData;
           _migrateLegacyEntries(); // ensure we migrate any legacy cloud data that just synced down
@@ -117,6 +129,13 @@ class MapProvider extends ChangeNotifier {
             _firestoreService.saveUserEntry(uid, e);
           }
         } else {
+          // Merge local guest entries into cloud
+          for (final localEntry in _entries) {
+            if (!cloudEntries.any((e) => e.id == localEntry.id)) {
+              _firestoreService.saveUserEntry(uid, localEntry);
+              cloudEntries.add(localEntry);
+            }
+          }
           _entries = cloudEntries;
           _entries.sort((a, b) => b.date.compareTo(a.date));
           notifyListeners();

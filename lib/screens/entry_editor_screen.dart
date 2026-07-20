@@ -41,12 +41,35 @@ class _EntryEditorScreenState extends State<EntryEditorScreen> {
     _photos = e != null ? List.from(e.photoUrls) : [];
   }
 
+  bool _isUploading = false;
+
   @override
   void dispose() {
     _titleController.dispose();
     _cityController.dispose();
     _noteController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final provider = Provider.of<MapProvider>(context, listen: false);
+    setState(() => _isUploading = true);
+    try {
+      final url = await provider.uploadPhotoWithPicker(widget.countryCode);
+      if (url != null) {
+        setState(() {
+          _photos.add(url);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      setState(() => _isUploading = false);
+    }
   }
 
   void _save() {
@@ -177,9 +200,55 @@ class _EntryEditorScreenState extends State<EntryEditorScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            
-            // For Phase 2, photo upload will go here
-            // Text("Photos will go here in Phase 2", style: TextStyle(color: Colors.grey)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(tr(context, 'photos'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                IconButton(
+                  icon: const Icon(Icons.add_a_photo),
+                  onPressed: _isUploading ? null : _pickAndUploadImage,
+                ),
+              ],
+            ),
+            if (_isUploading) const Padding(padding: EdgeInsets.all(8.0), child: CircularProgressIndicator()),
+            if (_photos.isNotEmpty)
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: _photos.length,
+                itemBuilder: (context, index) {
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(_photos[index], fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _photos.removeAt(index);
+                            });
+                          },
+                          child: Container(
+                            decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                            child: const Icon(Icons.close, color: Colors.white, size: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

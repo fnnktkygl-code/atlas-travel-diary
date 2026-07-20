@@ -121,9 +121,13 @@ class UserProfileModal extends StatelessWidget {
                         foregroundColor: Colors.redAccent,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      onPressed: () {
-                        authProvider.signOut();
-                        Navigator.pop(context);
+                      onPressed: () async {
+                        try {
+                          await authProvider.signOut();
+                        } catch (e) {
+                          debugPrint('Logout failed: $e');
+                        }
+                        if (context.mounted) Navigator.pop(context);
                       },
                     )
                   else
