@@ -117,7 +117,7 @@ class MapScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Atlas - Carnet de voyage'),
+        title: Text(tr(context, 'app_title')),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/locale_provider.dart';
 import '../theme/app_theme.dart';
 
 class AuthScreen extends StatelessWidget {
@@ -30,8 +31,8 @@ class AuthScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Votre carnet de voyage synchronisé',
+              Text(
+                tr(context, 'auth_subtitle'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -43,14 +44,14 @@ class AuthScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: Text(
-                    "Erreur : ${context.watch<AuthProvider>().errorMessage}",
+                    "${tr(context, 'error_login')} : ${context.watch<AuthProvider>().errorMessage}",
                     style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),
               ElevatedButton.icon(
                 icon: const Icon(Icons.login),
-                label: const Text('Se connecter avec Google'),
+                label: Text(tr(context, 'auth_google')),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.countryLived,
                   foregroundColor: Colors.white,
@@ -66,7 +67,7 @@ class AuthScreen extends StatelessWidget {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text("Erreur de connexion : $e"),
+                          content: Text("${tr(context, 'error_login')} : $e"),
                           backgroundColor: Colors.red,
                         ),
                       );

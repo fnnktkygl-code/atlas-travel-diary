@@ -436,7 +436,7 @@ class _NotesSectionState extends State<_NotesSection> {
                 foregroundColor: Theme.of(context).colorScheme.surfaceTint,
               ),
               onPressed: _save,
-              child: const Text('Enregistrer'),
+              child: Text(tr(context, 'save')),
             ),
           ),
         ] else ...[
@@ -497,7 +497,7 @@ class _PhotosSectionState extends State<_PhotosSection> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur lors de l'upload: $e")),
+        SnackBar(content: Text("${tr(context, 'upload_error')}: $e")),
       );
     } finally {
       if (mounted) setState(() => _isUploading = false);
