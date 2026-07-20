@@ -83,15 +83,29 @@ class FirestoreService {
         .delete();
   }
 
+  Future<void> deleteSpecificData(String uid, List<String> countryIds, List<String> entryIds) async {
+    final batch = _db.batch();
+    
+    for (var id in countryIds) {
+      batch.delete(_db.collection('users').doc(uid).collection('countries').doc(id));
+    }
+    
+    for (var id in entryIds) {
+      batch.delete(_db.collection('users').doc(uid).collection('entries').doc(id));
+    }
+    
+    await batch.commit();
+  }
+
   Future<void> resetUserData(String uid) async {
     final batch = _db.batch();
     
-    final countries = await _db.collection('users').doc(uid).collection('countries').get();
+    final countries = await _db.collection('users').doc(uid).collection('countries').get(const GetOptions(source: Source.server));
     for (var doc in countries.docs) {
       batch.delete(doc.reference);
     }
     
-    final entries = await _db.collection('users').doc(uid).collection('entries').get();
+    final entries = await _db.collection('users').doc(uid).collection('entries').get(const GetOptions(source: Source.server));
     for (var doc in entries.docs) {
       batch.delete(doc.reference);
     }

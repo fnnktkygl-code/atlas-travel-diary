@@ -170,14 +170,19 @@ class MapProvider extends ChangeNotifier {
   }
 
   Future<void> resetAccount(BuildContext context) async {
+    final uid = authProvider.uid;
+    final countryKeys = _userData.keys.toList();
+    final entryKeys = _entries.map((e) => e.id).toList();
+
     _userData.clear();
     _entries.clear();
     await HiveRepository.clearAll();
     notifyListeners();
 
-    final uid = authProvider.uid;
     if (uid != null) {
       try {
+        await _firestoreService.deleteSpecificData(uid, countryKeys, entryKeys);
+        // Also call resetUserData just in case there are orphaned documents on the server
         await _firestoreService.resetUserData(uid);
       } catch (e) {
         if (context.mounted) {
